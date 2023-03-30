@@ -4,11 +4,17 @@ package com.example.decorativeclock
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.ImageDecoder
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -155,6 +161,14 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setBackgroundImage()
     }
 
     // Add these helper methods to fade in and fade out the views
@@ -279,6 +293,34 @@ class MainActivity : AppCompatActivity() {
         } else {
             0
         }
+    }
+
+    private fun setBackgroundImage() {
+        val sharedPreferences = getSharedPreferences("clock_data", Context.MODE_PRIVATE)
+        val backgroundImageUriString = sharedPreferences.getString("background_image_uri", null)
+
+        if (backgroundImageUriString != null) {
+            val backgroundImageUri = Uri.parse(backgroundImageUriString)
+            val frameLayout = findViewById<FrameLayout>(R.id.frameLayout)
+
+            try {
+                val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, backgroundImageUri))
+                } else {
+                    @Suppress("DEPRECATION")
+                    MediaStore.Images.Media.getBitmap(contentResolver, backgroundImageUri)
+                }
+                frameLayout.background = BitmapDrawable(resources, bitmap)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Error loading background image", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        setBackgroundImage()
     }
 
 
