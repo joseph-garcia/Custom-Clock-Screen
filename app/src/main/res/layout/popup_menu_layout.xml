@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:drawable/menuitem_background">
+
+    <TextView
+        android:id="@+id/changeBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Background"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/changeFont"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Font"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:padding="10dp" />
+
+</LinearLayout>

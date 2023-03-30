@@ -3,18 +3,13 @@ package com.example.decorativeclock
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
-import android.view.ViewTreeObserver
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.PopupMenu
-import android.widget.TextView
+import android.view.*
+import android.widget.*
 import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -48,8 +43,8 @@ class MainActivity : AppCompatActivity() {
         val handler = Handler(Looper.getMainLooper())
         val longPressRunnable = Runnable {
             lastEvent?.let { event ->
-                val x = event.x
-                val y = event.y
+                val x = event.rawX.toInt()
+                val y = event.rawY.toInt()
                 showMenu(x, y)
             }
         }
@@ -198,28 +193,36 @@ class MainActivity : AppCompatActivity() {
         return Triple(x, y, scaleFactor)
     }
 
-    private fun showMenu(x: Float, y: Float) {
-        val anchorView = View(this)
-        anchorView.x = x
-        anchorView.y = y
-        val popupMenu = PopupMenu(this, anchorView)
-        popupMenu.inflate(R.menu.menu_layout)
+    private fun showMenu(x: Int, y: Int) {
+        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = inflater.inflate(R.layout.popup_menu_layout, null)
 
-        popupMenu.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.changeBackground -> {
-                    // Handle change background action
-                }
-                R.id.changeFont -> {
-                    // Handle change font action
-                }
-                R.id.settings -> {
-                    // Handle settings action
-                }
-            }
+        val popupWindow = PopupWindow(
+            popupView,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
             true
+        )
+
+        // Set click listeners for the TextViews in popup_menu_layout.xml
+        popupView.findViewById<TextView>(R.id.changeBackground).setOnClickListener {
+            // Handle change background action
+            popupWindow.dismiss()
         }
-        popupMenu.show()
+
+        popupView.findViewById<TextView>(R.id.changeFont).setOnClickListener {
+            // Handle change font action
+            popupWindow.dismiss()
+        }
+
+        popupView.findViewById<TextView>(R.id.settings).setOnClickListener {
+            // Handle settings action
+            popupWindow.dismiss()
+        }
+
+        // Show the PopupWindow
+        val frameLayout = findViewById<FrameLayout>(R.id.frameLayout)
+        popupWindow.showAtLocation(frameLayout, Gravity.NO_GRAVITY, x, y)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
