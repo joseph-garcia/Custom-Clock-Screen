@@ -4,7 +4,6 @@ package com.example.decorativeclock
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
@@ -13,11 +12,9 @@ import android.os.Looper
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.concurrent.timerTask
 import kotlin.math.max
 import kotlin.math.min
 
@@ -32,44 +29,71 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resetPositionButton: Button
     private var dX = 0f
     private var dY = 0f
-    
+
+    private lateinit var optionsIcon: ImageView
+    private val fadeHandler = Handler(Looper.getMainLooper())
+    private var statusBarHeight = 0
+
+    private val fadeOutHandler = Handler(Looper.getMainLooper())
+    private val fadeOutRunnable = Runnable { fadeOutViews() }
+
+    private val notificationBarHandler = Handler(Looper.getMainLooper())
+
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val optionsIcon: ImageView = findViewById(R.id.optionsIcon)
+        // Initialize optionsIcon
+        optionsIcon = findViewById(R.id.optionsIcon)
+        optionsIcon.y = statusBarHeight.toFloat()
+
+        statusBarHeight = getStatusBarHeight()
+
         optionsIcon.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
-        clockTextView = findViewById(R.id.clockTextView)
-        scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
-
-        val handler = Handler(Looper.getMainLooper())
-        val longPressRunnable = Runnable {
-            lastEvent?.let { event ->
-                val x = event.rawX.toInt()
-                val y = event.rawY.toInt()
-                showMenu(x, y)
-            }
+        val fadeOutRunnable = Runnable {
+            fadeOutViews()
         }
 
         val frameLayout = findViewById<FrameLayout>(R.id.frameLayout)
         frameLayout.setOnTouchListener { view, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    lastEvent = event
-                    handler.postDelayed(longPressRunnable, 1000) // Long press threshold (1000ms)
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_MOVE -> {
-                    handler.removeCallbacks(longPressRunnable)
-                }
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                fadeInViews()
+
+                // Cancel any pending fade-out actions
+                fadeOutHandler.removeCallbacks(fadeOutRunnable)
+                notificationBarHandler.removeCallbacksAndMessages(null) // Add this line
+
+                // Schedule a new fade-out action
+                fadeOutHandler.postDelayed(fadeOutRunnable, 5000)
             }
             false
         }
+
+
+        // Set up the fade in/out behavior
+        val decorView = window.decorView
+        decorView.setOnSystemUiVisibilityChangeListener { visibility ->
+            if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
+                fadeInViews()
+            } else {
+                fadeOutViews()
+            }
+        }
+
+        // Add this line to start the fade out timer when the app starts
+        fadeHandler.postDelayed(fadeOutRunnable, 5000)
+
+        clockTextView = findViewById(R.id.clockTextView)
+        scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
+
+        val handler = Handler(Looper.getMainLooper())
 
         val updateClockRunnable = object : Runnable {
             @RequiresApi(Build.VERSION_CODES.O)
@@ -78,9 +102,7 @@ class MainActivity : AppCompatActivity() {
                 handler.postDelayed(this, 60000)
             }
         }
-
         handler.post(updateClockRunnable)
-
 
         // Load and set the saved clock data (position and scale factor)
         val clockData = loadClockPosition()
@@ -133,6 +155,51 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+    }
+
+    // Add these helper methods to fade in and fade out the views
+    private fun fadeOutViews() {
+        optionsIcon.animate().alpha(0f).duration = 300
+
+        // Use the new notification bar handler to schedule a new action
+        notificationBarHandler.postDelayed({
+            hideSystemUI()
+        }, 3000) // 3 seconds idle threshold
+    }
+
+    private fun fadeInViews() {
+
+
+        showSystemUI()
+
+        optionsIcon.animate()
+            .alpha(1f)
+            .setDuration(300)
+            .withEndAction {
+                // Reset the options icon's position
+                optionsIcon.y = statusBarHeight.toFloat()
+
+            }
+            .start()
+    }
+
+    private fun hideSystemUI() {
+        val decorView = window.decorView
+        val uiOptions = (View.SYSTEM_UI_FLAG_LOW_PROFILE
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        decorView.systemUiVisibility = uiOptions
+    }
+
+    private fun showSystemUI() {
+        val decorView = window.decorView
+        val uiOptions = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+        decorView.systemUiVisibility = uiOptions
     }
 
 
@@ -197,43 +264,25 @@ class MainActivity : AppCompatActivity() {
         return Triple(x, y, scaleFactor)
     }
 
-    private fun showMenu(x: Int, y: Int) {
-        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val popupView = inflater.inflate(R.layout.popup_menu_layout, null)
-
-        val popupWindow = PopupWindow(
-            popupView,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            true
-        )
-
-        // Set click listeners for the TextViews in popup_menu_layout.xml
-        popupView.findViewById<TextView>(R.id.changeBackground).setOnClickListener {
-            // Handle change background action
-            popupWindow.dismiss()
-        }
-
-        popupView.findViewById<TextView>(R.id.changeFont).setOnClickListener {
-            // Handle change font action
-            popupWindow.dismiss()
-        }
-
-        popupView.findViewById<TextView>(R.id.settings).setOnClickListener {
-            // Handle settings action
-            popupWindow.dismiss()
-        }
-
-        // Show the PopupWindow
-        val frameLayout = findViewById<FrameLayout>(R.id.frameLayout)
-        popupWindow.showAtLocation(frameLayout, Gravity.NO_GRAVITY, x, y)
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateClock() {
         val currentTime = LocalDateTime.now()
         val formattedTime = currentTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
         clockTextView.text = formattedTime
     }
+
+    // Add this method to get the status bar height for the options icon
+    private fun getStatusBarHeight(): Int {
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (resourceId > 0) {
+            resources.getDimensionPixelSize(resourceId)
+        } else {
+            0
+        }
+    }
+
+
+
+
 
 }
