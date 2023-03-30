@@ -1,9 +1,11 @@
 package com.example.decorativeclock
 
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Handler
@@ -36,6 +38,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val optionsIcon: ImageView = findViewById(R.id.optionsIcon)
+        optionsIcon.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
 
         clockTextView = findViewById(R.id.clockTextView)
         scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
@@ -73,10 +81,6 @@ class MainActivity : AppCompatActivity() {
 
         handler.post(updateClockRunnable)
 
-//        resetPositionButton = findViewById(R.id.resetPositionButton)
-//        resetPositionButton.setOnClickListener {
-//            resetClockPosition()
-//        }
 
         // Load and set the saved clock data (position and scale factor)
         val clockData = loadClockPosition()

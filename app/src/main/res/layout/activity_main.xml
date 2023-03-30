@@ -19,6 +19,14 @@
         android:textColor="@color/clockTextColor"
         android:background="@drawable/clock_background" />
 
+    <ImageView
+        android:id="@+id/optionsIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:padding="16dp"
+        android:src="@android:drawable/ic_menu_manage" />
+
 
 
 </FrameLayout>
