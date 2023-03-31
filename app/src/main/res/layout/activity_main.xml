@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:id="@+id/background_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
@@ -33,5 +40,8 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
         android:src="@android:drawable/ic_menu_manage" />
+
+
+
 
 </RelativeLayout>
