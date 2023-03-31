@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     // Initialize scaleGestureDetector for pinch-to-resize
     private lateinit var scaleGestureDetector: ScaleGestureDetector
     private var scaleFactor = 1f
+    private var isRotating = false
 
     // Initialize variables for dragging the clock
     private var dX = 0f
@@ -145,6 +146,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+
 
 
         clockTextView.setOnTouchListener { view, event ->
@@ -327,11 +329,19 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun rotateClockTextView() {
-        clockTextView.animate()
-            .rotationBy(90f)
-            .setDuration(500)
-            .start()
+        if (!isRotating) {
+            isRotating = true
+            clockTextView.animate()
+                .rotationBy(90f)
+                .setDuration(500)
+                .withEndAction {
+                    isRotating = false
+                    saveClockPosition(clockTextView.x, clockTextView.y, scaleFactor)
+                }
+                .start()
+        }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateClock() {
