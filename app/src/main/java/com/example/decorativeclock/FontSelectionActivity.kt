@@ -39,7 +39,6 @@ class FontSelectionActivity : AppCompatActivity() {
         fontSpinner = findViewById(R.id.font_spinner)
         previewTextView = findViewById(R.id.preview_text_view)
         val saveFontButton: Button = findViewById(R.id.save_font_button)
-        val previewBackgroundImage: ImageView = findViewById(R.id.preview_background_image)
 
 
 
@@ -69,30 +68,6 @@ class FontSelectionActivity : AppCompatActivity() {
             }
             finish()
         }
-
-        val backgroundImageUriString = sharedPreferences.getString("background_image_uri", null)
-        if (backgroundImageUriString != null) {
-            val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
-            setBackgroundImage(previewBackgroundImage, backgroundImageUri)
-        }
-
-
-
-
-    }
-
-    private fun setBackgroundImage(imageView: ImageView, resultUri: Uri) {
-        val requestOptions = RequestOptions()
-            .centerCrop()
-            .error(com.bumptech.glide.R.drawable.abc_control_background_material) // Replace with your own error image
-
-        Glide.with(this)
-            .load(resultUri)
-            .apply(requestOptions)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .skipMemoryCache(true)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .into(imageView)
     }
 
 }
