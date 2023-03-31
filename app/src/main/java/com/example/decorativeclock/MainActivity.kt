@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
     // Initialize clockTextView
     private lateinit var clockTextView: TextView
 
-
     private lateinit var gestureDetector: GestureDetector
 
     // Initialize scaleGestureDetector for pinch-to-resize
@@ -66,9 +65,6 @@ class MainActivity : AppCompatActivity() {
 
     // Initialize notificationBarHandler for fading in/out the notification bar
     private val notificationBarHandler = Handler(Looper.getMainLooper())
-
-    private lateinit var saveBackgroundImageUri: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
 
     companion object {
         private const val REQUEST_IMAGE_PICK = 1000
@@ -98,41 +94,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Listen for options icon long click
-        val fadeOutRunnable = Runnable {
-            fadeOutViews()
-        }
-
-        // Add this line to cancel the fade out timer when the notification bar is tapped
-        val frameLayout = findViewById<FrameLayout>(R.id.frameLayout)
-        frameLayout.setOnTouchListener { view, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                fadeInViews()
-
-                // Cancel any pending fade-out actions
-                fadeOutHandler.removeCallbacks(fadeOutRunnable)
-                notificationBarHandler.removeCallbacksAndMessages(null) // Add this line
-
-                // Schedule a new fade-out action
-                fadeOutHandler.postDelayed(fadeOutRunnable, 5000)
-            }
-            false
-        }
+        setupFadeInFadeOutBehavior()
 
 
-        // Set up the fade in/out behavior
-        val contentView = findViewById<View>(android.R.id.content)
-        val controller = WindowCompat.getInsetsController(window, contentView)
-        controller?.addOnControllableInsetsChangedListener { _, mask ->
-            if (mask and WindowInsetsCompat.Type.statusBars() == 0) {
-                fadeInViews()
-            } else {
-                fadeOutViews()
-            }
-        }
-
-        // Add this line to start the fade out timer when the app starts
-        fadeHandler.postDelayed(fadeOutRunnable, 5000)
 
         clockTextView = findViewById(R.id.clockTextView)
         scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
@@ -175,11 +139,13 @@ class MainActivity : AppCompatActivity() {
                 if (clockData.first != -1f && clockData.second != -1f) {
                     clockTextView.x = clockData.first.coerceIn(minX, maxX)
                     clockTextView.y = clockData.second.coerceIn(minY, maxY)
+                    clockTextView.rotation = clockData.fourth
                 } else {
                     resetClockPosition()
                 }
             }
         })
+
 
         clockTextView.setOnTouchListener { view, event ->
             scaleGestureDetector.onTouchEvent(event)
@@ -213,13 +179,45 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun rotateClockTextView() {
-        clockTextView.animate()
-            .rotationBy(90f)
-            .setDuration(500)
-            .start()
-    }
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupFadeInFadeOutBehavior() {
+        // Set up the fade in/out behavior
+        val fadeOutRunnable = Runnable { fadeOutViews() }
 
+        // Add this line to start the fade out timer when the app starts
+        fadeHandler.postDelayed(fadeOutRunnable, 5000)
+
+        // Cancels the fade out timer when the app is tapped
+        val frameLayout = findViewById<FrameLayout>(R.id.frameLayout)
+        frameLayout.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                fadeInViews()
+
+                // Cancel any pending fade-out actions
+                fadeOutHandler.removeCallbacks(fadeOutRunnable)
+                notificationBarHandler.removeCallbacksAndMessages(null)
+
+                // Schedule a new fade-out action
+                fadeOutHandler.postDelayed(fadeOutRunnable, 5000)
+            }
+            false
+        }
+
+        // Set up the fade in/out behavior for the status bar
+        val contentView = findViewById<View>(android.R.id.content)
+        val controller = WindowCompat.getInsetsController(
+            window,
+            contentView
+        ) // gets the insets controller which is used to control the visibility of the status bar
+        // this listener is called when the status bar visibility changes
+        controller.addOnControllableInsetsChangedListener { _, mask ->
+            if (mask and WindowInsetsCompat.Type.statusBars() == 0) {
+                fadeInViews()
+            } else {
+                fadeOutViews()
+            }
+        }
+    }
 
 
     // Add these helper methods to fade in and fade out the views
@@ -251,19 +249,19 @@ class MainActivity : AppCompatActivity() {
     private fun hideSystemUI() {
         val contentView = findViewById<View>(android.R.id.content)
         val controller = WindowCompat.getInsetsController(window, contentView)
-        controller?.hide(WindowInsetsCompat.Type.statusBars())
+        controller.hide(WindowInsetsCompat.Type.statusBars())
     }
 
 
     private fun showSystemUI() {
         val contentView = findViewById<View>(android.R.id.content)
         val controller = WindowCompat.getInsetsController(window, contentView)
-        controller?.show(WindowInsetsCompat.Type.statusBars())
+        controller.show(WindowInsetsCompat.Type.statusBars())
     }
 
 
 
-    // Add this method to save the clock position and scale factor when the app is paused?
+    // this method is called when the app is paused and it saves the clock position and scale factor
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
 
@@ -311,10 +309,11 @@ class MainActivity : AppCompatActivity() {
         editor.putFloat("${orientationKey}_x", x)
         editor.putFloat("${orientationKey}_y", y)
         editor.putFloat("${orientationKey}_scaleFactor", scaleFactor)
+        editor.putFloat("${orientationKey}_rotation", clockTextView.rotation)
         editor.apply()
     }
 
-    private fun loadClockPosition(): Triple<Float, Float, Float> {
+    private fun loadClockPosition(): Quadruple<Float, Float, Float, Float> {
         val sharedPreferences = getSharedPreferences("clock_data", MODE_PRIVATE)
         val orientation = resources.configuration.orientation
         val orientationKey = if (orientation == Configuration.ORIENTATION_PORTRAIT) "portrait" else "landscape"
@@ -322,7 +321,16 @@ class MainActivity : AppCompatActivity() {
         val x = sharedPreferences.getFloat("${orientationKey}_x", -1f)
         val y = sharedPreferences.getFloat("${orientationKey}_y", -1f)
         val scaleFactor = sharedPreferences.getFloat("${orientationKey}_scaleFactor", 1f)
-        return Triple(x, y, scaleFactor)
+        val rotation = sharedPreferences.getFloat("${orientationKey}_rotation", 0f) // Add this line
+        return Quadruple(x, y, scaleFactor, rotation)
+    }
+
+
+    private fun rotateClockTextView() {
+        clockTextView.animate()
+            .rotationBy(90f)
+            .setDuration(500)
+            .start()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -373,19 +381,10 @@ class MainActivity : AppCompatActivity() {
             .into(backgroundImageView)
     }
 
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
-        if (backgroundImageUriString != null) {
-            val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
-            setBackgroundImage(backgroundImageUri)
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        // Handles the result of the image picker, if the user selected an image, it will be cropped to the screen size
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
             val selectedImageUri = data.data
             if (selectedImageUri != null) {
@@ -399,6 +398,7 @@ class MainActivity : AppCompatActivity() {
                     .withAspectRatio(screenWidth.toFloat(), screenHeight.toFloat())
                 uCrop.start(this)
             }
+        // Handles the result of the image cropper, if the user cropped the image, it will be saved to the app's internal storage
         } else if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data!!)
             if (resultUri != null) {
@@ -424,3 +424,5 @@ class MainActivity : AppCompatActivity() {
 
 
 }
+
+data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
