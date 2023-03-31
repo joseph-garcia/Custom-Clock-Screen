@@ -72,7 +72,16 @@ class SettingsActivity : AppCompatActivity() {
     private fun saveCroppedImageUri(uri: Uri) {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("background_image_uri", uri.toString())
+
+        val inputStream = contentResolver.openInputStream(uri)
+        val backgroundFile = File(filesDir, "background_image")
+        val outputStream = FileOutputStream(backgroundFile)
+
+        inputStream?.copyTo(outputStream)
+        inputStream?.close()
+        outputStream.close()
+
+        editor.putString("background_image_uri", backgroundFile.absolutePath)
         editor.apply()
     }
 

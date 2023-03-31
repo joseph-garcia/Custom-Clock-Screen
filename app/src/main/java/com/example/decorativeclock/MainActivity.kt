@@ -38,6 +38,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
+import java.io.FileOutputStream
 
 
 class MainActivity : AppCompatActivity() {
@@ -345,7 +346,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
         if (backgroundImageUriString != null) {
-            val backgroundImageUri = Uri.parse(backgroundImageUriString)
+            val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
             setBackgroundImage(backgroundImageUri)
         }
     }
@@ -372,7 +373,7 @@ class MainActivity : AppCompatActivity() {
         super.onConfigurationChanged(newConfig)
         val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
         if (backgroundImageUriString != null) {
-            val backgroundImageUri = Uri.parse(backgroundImageUriString)
+            val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
             setBackgroundImage(backgroundImageUri)
         }
     }
@@ -396,10 +397,24 @@ class MainActivity : AppCompatActivity() {
         } else if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data!!)
             if (resultUri != null) {
+                val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+
+                val inputStream = contentResolver.openInputStream(resultUri)
+                val backgroundFile = File(filesDir, "background_image")
+                val outputStream = FileOutputStream(backgroundFile)
+
+                inputStream?.copyTo(outputStream)
+                inputStream?.close()
+                outputStream.close()
+
+                editor.putString("background_image_uri", backgroundFile.absolutePath)
+                editor.apply()
+
                 setBackgroundImage(resultUri)
-                editor.putString("background_image_uri", resultUri.toString()).apply()
             }
         }
+
     }
 
 
