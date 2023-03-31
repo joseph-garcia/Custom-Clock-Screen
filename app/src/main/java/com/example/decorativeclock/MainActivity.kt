@@ -255,6 +255,7 @@ class MainActivity : AppCompatActivity() {
         val contentView = findViewById<View>(android.R.id.content)
         val controller = WindowCompat.getInsetsController(window, contentView)
         controller.hide(WindowInsetsCompat.Type.statusBars())
+        controller.hide(WindowInsetsCompat.Type.navigationBars())
     }
 
 
@@ -262,6 +263,7 @@ class MainActivity : AppCompatActivity() {
         val contentView = findViewById<View>(android.R.id.content)
         val controller = WindowCompat.getInsetsController(window, contentView)
         controller.show(WindowInsetsCompat.Type.statusBars())
+        controller.show(WindowInsetsCompat.Type.navigationBars())
     }
 
 

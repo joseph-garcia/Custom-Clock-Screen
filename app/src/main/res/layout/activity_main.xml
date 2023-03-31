@@ -25,9 +25,15 @@
             android:layout_gravity="center"
             android:textSize="30sp"
             android:text="00:00:00"
-            android:padding="8dp"
+            android:padding="2dp"
             android:elevation="6dp"
-            android:textColor="@color/clockTextColor" />
+            android:textColor="@color/clockTextColor"
+            android:textStyle="bold"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="6"
+        />
 
     </FrameLayout>
 

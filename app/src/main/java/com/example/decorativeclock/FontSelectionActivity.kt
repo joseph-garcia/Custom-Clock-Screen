@@ -2,8 +2,10 @@ package com.example.decorativeclock
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -40,7 +42,16 @@ class FontSelectionActivity : AppCompatActivity() {
         previewTextView = findViewById(R.id.preview_text_view)
         val saveFontButton: Button = findViewById(R.id.save_font_button)
 
+        // Initialize colorPickerView
         colorPickerView = findViewById(R.id.color_picker_view)
+
+        // Retrieve the current clock text color from shared preferences
+        val currentClockTextColor = sharedPreferences.getInt("clock_text_color", Color.BLACK)
+
+        Log.d("josephDebug", "currentClockTextColor: $currentClockTextColor")
+
+        // Set the initial color for the color picker view
+        colorPickerView.setInitialColor(currentClockTextColor)
 
         val fontAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fontMap.keys.toList())
         fontAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
