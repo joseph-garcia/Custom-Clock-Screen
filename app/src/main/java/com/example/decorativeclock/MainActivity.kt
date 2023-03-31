@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
@@ -176,6 +177,8 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
+        loadClockSettings()
 
 
 
@@ -372,6 +375,8 @@ class MainActivity : AppCompatActivity() {
         val clockFont = sharedPreferences.getString("clock_font", "sans-serif")
         val clockTextView = findViewById<TextView>(R.id.clockTextView)
         clockTextView.typeface = Typeface.create(clockFont, Typeface.NORMAL)
+
+        loadClockSettings()
     }
 
     private fun setBackgroundImage(resultUri: Uri) {
@@ -430,6 +435,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun loadClockSettings() {
+        val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
+        val font = sharedPreferences.getString("clock_font", "sans-serif")
+        val textColor = sharedPreferences.getInt("clock_text_color", Color.BLACK)
+
+        clockTextView.typeface = Typeface.create(font, Typeface.NORMAL)
+        clockTextView.setTextColor(textColor)
     }
 
 

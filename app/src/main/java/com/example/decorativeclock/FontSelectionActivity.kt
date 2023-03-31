@@ -3,17 +3,15 @@ package com.example.decorativeclock
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Typeface
-import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
-import java.io.File
+import androidx.appcompat.app.AppCompatActivity
+import com.skydoves.colorpickerview.ColorEnvelope
+import com.skydoves.colorpickerview.ColorPickerView
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+import com.skydoves.colorpickerview.listeners.ColorListener
+
 
 class FontSelectionActivity : AppCompatActivity() {
 
@@ -21,6 +19,8 @@ class FontSelectionActivity : AppCompatActivity() {
     private lateinit var previewTextView: TextView
 
     private lateinit var sharedPreferences: SharedPreferences
+
+    private lateinit var colorPickerView: ColorPickerView
 
     private val fontMap = mapOf(
         "Default" to "sans-serif",
@@ -40,7 +40,7 @@ class FontSelectionActivity : AppCompatActivity() {
         previewTextView = findViewById(R.id.preview_text_view)
         val saveFontButton: Button = findViewById(R.id.save_font_button)
 
-
+        colorPickerView = findViewById(R.id.color_picker_view)
 
         val fontAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fontMap.keys.toList())
         fontAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -58,12 +58,24 @@ class FontSelectionActivity : AppCompatActivity() {
             }
         }
 
+        colorPickerView.setColorListener(object : ColorEnvelopeListener {
+            override fun onColorSelected(envelope: ColorEnvelope, fromUser: Boolean) {
+                previewTextView.setTextColor(envelope.color)
+            }
+        })
+
+
+
+
+
         saveFontButton.setOnClickListener {
             val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
+            val selectedColor = colorPickerView.colorEnvelope.color
             if (selectedFont != null) {
                 editor.putString("clock_font", selectedFont)
+                editor.putInt("clock_text_color", selectedColor)
                 editor.apply()
             }
             finish()

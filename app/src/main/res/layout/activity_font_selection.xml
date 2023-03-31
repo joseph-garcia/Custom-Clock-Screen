@@ -14,8 +14,10 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp" />
 
-
-
+    <com.skydoves.colorpickerview.ColorPickerView
+        android:id="@+id/color_picker_view"
+        android:layout_width="300dp"
+        android:layout_height="300dp" />
 
 
     <TextView
