@@ -33,6 +33,7 @@ import kotlin.math.min
 import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.model.AspectRatio
 import android.graphics.Point
+import android.graphics.Typeface
 import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -349,6 +350,10 @@ class MainActivity : AppCompatActivity() {
             val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
             setBackgroundImage(backgroundImageUri)
         }
+
+        val clockFont = sharedPreferences.getString("clock_font", "sans-serif")
+        val clockTextView = findViewById<TextView>(R.id.clockTextView)
+        clockTextView.typeface = Typeface.create(clockFont, Typeface.NORMAL)
     }
 
     private fun setBackgroundImage(resultUri: Uri) {

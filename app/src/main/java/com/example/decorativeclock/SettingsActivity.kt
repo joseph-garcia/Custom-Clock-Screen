@@ -28,6 +28,13 @@ class SettingsActivity : AppCompatActivity() {
         changeBackgroundButton.setOnClickListener {
             openImagePicker()
         }
+
+        val changeFontButton = findViewById<Button>(R.id.change_font_button)
+        changeFontButton.setOnClickListener {
+            val intent = Intent(this, FontSelectionActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     private fun openImagePicker() {
