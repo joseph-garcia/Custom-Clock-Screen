@@ -218,14 +218,7 @@ class MainActivity : AppCompatActivity() {
             .start()
     }
 
-    override fun onResume() {
-        super.onResume()
-        val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
-        if (backgroundImageUriString != null) {
-            val backgroundImageUri = Uri.parse(backgroundImageUriString)
-            setBackgroundImage(backgroundImageUri)
-        }
-    }
+
 
     // Add these helper methods to fade in and fade out the views
     private fun fadeOutViews() {
@@ -268,6 +261,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    // Add this method to save the clock position and scale factor when the app is paused?
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
 
@@ -346,6 +340,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Add this method to save the background image URI
+    override fun onResume() {
+        super.onResume()
+        val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
+        if (backgroundImageUriString != null) {
+            val backgroundImageUri = Uri.parse(backgroundImageUriString)
+            setBackgroundImage(backgroundImageUri)
+        }
+    }
+
     private fun setBackgroundImage(resultUri: Uri) {
         val backgroundImageView = findViewById<ImageView>(R.id.background_image)
 
@@ -371,12 +375,6 @@ class MainActivity : AppCompatActivity() {
             val backgroundImageUri = Uri.parse(backgroundImageUriString)
             setBackgroundImage(backgroundImageUri)
         }
-    }
-
-
-    private fun startImagePicker() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, IMAGE_PICK_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

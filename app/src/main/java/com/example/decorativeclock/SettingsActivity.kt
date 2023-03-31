@@ -46,15 +46,19 @@ class SettingsActivity : AppCompatActivity() {
         if (requestCode == IMAGE_PICK_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             val selectedImageUri = data.data
             if (selectedImageUri != null) {
-                val display = windowManager.defaultDisplay
-                val size = Point()
-                display.getSize(size)
-                val screenWidth = size.x
-                val screenHeight = size.y
+                if (isGifFile(this, selectedImageUri)) {
+                    saveCroppedImageUri(selectedImageUri)
+                } else {
+                    val display = windowManager.defaultDisplay
+                    val size = Point()
+                    display.getSize(size)
+                    val screenWidth = size.x
+                    val screenHeight = size.y
 
-                val uCrop = UCrop.of(selectedImageUri, Uri.fromFile(File(cacheDir, "background_image.jpg")))
-                    .withAspectRatio(screenWidth.toFloat(), screenHeight.toFloat())
-                uCrop.start(this)
+                    val uCrop = UCrop.of(selectedImageUri, Uri.fromFile(File(cacheDir, "background_image.jpg")))
+                        .withAspectRatio(screenWidth.toFloat(), screenHeight.toFloat())
+                    uCrop.start(this)
+                }
             }
         } else if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data!!)
@@ -64,6 +68,7 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+
     private fun saveCroppedImageUri(uri: Uri) {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -71,11 +76,15 @@ class SettingsActivity : AppCompatActivity() {
         editor.apply()
     }
 
-
     private fun isGifFile(context: Context, uri: Uri): Boolean {
         val mimeType: String? = context.contentResolver.getType(uri)
         return mimeType?.equals("image/gif", ignoreCase = true) == true
     }
+
+
+
+
+
 
 
 
