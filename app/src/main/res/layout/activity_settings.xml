@@ -1,27 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".SettingsActivity">
 
     <Button
         android:id="@+id/changeBackgroundButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Change Background" />
-
-    <Button
-        android:id="@+id/change_font_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Change Font" />
+    
 
     <Switch
         android:id="@+id/toggleMilitaryTimeSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Toggle Military Time" />
+
+    <Spinner
+        android:id="@+id/font_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <com.skydoves.colorpickerview.ColorPickerView
+        android:id="@+id/color_picker_view"
+        android:layout_width="300dp"
+        android:layout_height="300dp" />
+
+
+    <TextView
+        android:id="@+id/preview_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:text="12:34 AM"
+        android:textSize="30sp"
+        />
+
+    <Button
+        android:id="@+id/save_font_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save" />
+
 
 </LinearLayout>
