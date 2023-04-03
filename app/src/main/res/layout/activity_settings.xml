@@ -12,23 +12,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Change Background" />
-    
+
 
     <Switch
         android:id="@+id/toggleMilitaryTimeSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:text="Toggle Military Time" />
 
     <Spinner
         android:id="@+id/font_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp" />
 
     <com.skydoves.colorpickerview.ColorPickerView
         android:id="@+id/color_picker_view"
         android:layout_width="300dp"
+        android:layout_gravity="center_horizontal"
         android:layout_height="300dp" />
 
 

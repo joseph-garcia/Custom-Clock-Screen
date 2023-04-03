@@ -50,6 +50,8 @@ class SettingsActivity : AppCompatActivity() {
             openImagePicker()
         }
 
+        val toggleMilitaryTimeSwitch: Switch = findViewById(R.id.toggleMilitaryTimeSwitch)
+
 //        val changeFontButton = findViewById<Button>(R.id.change_font_button)
 //        changeFontButton.setOnClickListener {
 //            val intent = Intent(this, FontSelectionActivity::class.java)
@@ -57,6 +59,22 @@ class SettingsActivity : AppCompatActivity() {
 //        }
 
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
+        val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
+        toggleMilitaryTimeSwitch.isChecked = isMilitaryTime
+
+        toggleMilitaryTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putBoolean("military_time", isChecked)
+                apply()
+            }
+            // Restart MainActivity to apply changes
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+
 
         fontSpinner = findViewById(R.id.font_spinner)
         previewTextView = findViewById(R.id.preview_text_view)

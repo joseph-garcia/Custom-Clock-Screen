@@ -4,27 +4,20 @@ package com.example.decorativeclock
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.ImageDecoder
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.decorativeclock.SettingsActivity.Companion.IMAGE_PICK_REQUEST_CODE
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -32,10 +25,8 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 import com.yalantis.ucrop.UCrop
-import com.yalantis.ucrop.model.AspectRatio
 import android.graphics.Point
 import android.graphics.Typeface
-import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -47,7 +38,6 @@ class MainActivity : AppCompatActivity() {
 
     // Initialize clockTextView
     private lateinit var clockTextView: TextView
-
     private lateinit var gestureDetector: GestureDetector
 
     // Initialize scaleGestureDetector for pinch-to-resize
@@ -75,13 +65,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
 
-
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
+        val isMilitaryTime = sharedPreferences.getBoolean("military_time", false)
 
         // Initialize optionsIcon
         optionsIcon = findViewById(R.id.optionsIcon)
@@ -95,10 +86,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
-
         setupFadeInFadeOutBehavior()
-
-
 
         clockTextView = findViewById(R.id.clockTextView)
         scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
@@ -108,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         val updateClockRunnable = object : Runnable {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun run() {
-                updateClock()
+                updateClock(isMilitaryTime)
                 handler.postDelayed(this, 60000)
             }
         }
@@ -148,8 +136,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-
-
         clockTextView.setOnTouchListener { view, event ->
             scaleGestureDetector.onTouchEvent(event)
             gestureDetector.onTouchEvent(event)
@@ -177,11 +163,7 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
         loadClockSettings()
-
-
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -236,10 +218,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fadeInViews() {
-
-
         showSystemUI()
-
         optionsIcon.animate()
             .alpha(1f)
             .setDuration(300)
@@ -258,15 +237,12 @@ class MainActivity : AppCompatActivity() {
         controller.hide(WindowInsetsCompat.Type.navigationBars())
     }
 
-
     private fun showSystemUI() {
         val contentView = findViewById<View>(android.R.id.content)
         val controller = WindowCompat.getInsetsController(window, contentView)
         controller.show(WindowInsetsCompat.Type.statusBars())
         controller.show(WindowInsetsCompat.Type.navigationBars())
     }
-
-
 
     // this method is called when the app is paused and it saves the clock position and scale factor
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -282,20 +258,17 @@ class MainActivity : AppCompatActivity() {
             clockTextView.y = clockTextView.y.coerceIn(minY, maxY)
         }
     }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putFloat("x", clockTextView.x)
         outState.putFloat("y", clockTextView.y)
         outState.putFloat("scaleFactor", scaleFactor)
     }
-
     private fun resetClockPosition() {
         clockTextView.x = (resources.displayMetrics.widthPixels - clockTextView.width) / 2f
         clockTextView.y = (resources.displayMetrics.heightPixels - clockTextView.height) / 2f
         saveClockPosition(clockTextView.x, clockTextView.y, 1.0f)
     }
-
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             scaleFactor *= detector.scaleFactor
@@ -306,7 +279,6 @@ class MainActivity : AppCompatActivity() {
             return true
         }
     }
-
     private fun saveClockPosition(x: Float, y: Float, scaleFactor: Float) {
         val sharedPreferences = getSharedPreferences("clock_data", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -331,8 +303,6 @@ class MainActivity : AppCompatActivity() {
         val rotation = sharedPreferences.getFloat("${orientationKey}_rotation", 0f) // Add this line
         return Quadruple(x, y, scaleFactor, rotation)
     }
-
-
     private fun rotateClockTextView() {
         if (!isRotating) {
             isRotating = true
@@ -346,15 +316,18 @@ class MainActivity : AppCompatActivity() {
                 .start()
         }
     }
-
-
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun updateClock() {
+    fun updateClock(isMilitaryTime: Boolean) {
+        if (!::clockTextView.isInitialized) return
+
         val currentTime = LocalDateTime.now()
-        val formattedTime = currentTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
+        val formattedTime = if (isMilitaryTime) {
+            currentTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+        } else {
+            currentTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
+        }
         clockTextView.text = formattedTime
     }
-
     // Add this method to get the status bar height for the options icon
     private fun getStatusBarHeight(): Int {
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
@@ -364,7 +337,6 @@ class MainActivity : AppCompatActivity() {
             0
         }
     }
-
     // Add this method to save the background image URI
     override fun onResume() {
         super.onResume()
@@ -380,14 +352,12 @@ class MainActivity : AppCompatActivity() {
 
         loadClockSettings()
     }
-
     private fun setBackgroundImage(resultUri: Uri) {
         val backgroundImageView = findViewById<ImageView>(R.id.background_image)
 
         val requestOptions = RequestOptions()
             .centerCrop()
             .error(com.bumptech.glide.R.drawable.abc_control_background_material) // Replace with your own error image
-
 
         Glide.with(this)
             .load(resultUri)
