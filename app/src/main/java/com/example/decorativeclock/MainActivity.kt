@@ -488,7 +488,8 @@ class MainActivity : AppCompatActivity() {
     private fun loadClockSettings() {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
         val selectedFont = sharedPreferences.getString("clock_font", "sans-serif")
-        val textColor = sharedPreferences.getInt("clock_text_color", Color.BLACK)
+        val textColor = sharedPreferences.getInt("clock_text_color", R.color.icon_color)
+        Log.d("josephDebug", "default color: ${R.color.icon_color}")
 
         if (selectedFont == "pressstart2p_regular") {
             val customTypeface = ResourcesCompat.getFont(this, R.font.pressstart2p_regular)

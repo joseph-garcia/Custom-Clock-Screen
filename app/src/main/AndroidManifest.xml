@@ -14,9 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DecorativeClock"
         tools:targetApi="31">
-        <activity
-            android:name=".FontSelectionActivity"
-            android:exported="false" />
+
 
         <provider
             android:name=".GenericFileProvider"

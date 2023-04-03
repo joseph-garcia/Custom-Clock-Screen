@@ -57,12 +57,6 @@ class SettingsActivity : AppCompatActivity() {
 
         val toggleMilitaryTimeSwitch: Switch = findViewById(R.id.toggleMilitaryTimeSwitch)
 
-//        val changeFontButton = findViewById<Button>(R.id.change_font_button)
-//        changeFontButton.setOnClickListener {
-//            val intent = Intent(this, FontSelectionActivity::class.java)
-//            startActivity(intent)
-//        }
-
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
         val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
         toggleMilitaryTimeSwitch.isChecked = isMilitaryTime
@@ -75,9 +69,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-//        // Initialize fontSpinner and set the current font as the selected item
-//        fontSpinner = findViewById(R.id.font_spinner)
-
 
 
         previewTextView = findViewById(R.id.preview_text_view)
@@ -87,7 +78,7 @@ class SettingsActivity : AppCompatActivity() {
         colorPickerView = findViewById(R.id.color_picker_view)
 
         // Retrieve the current clock text color from shared preferences
-        val currentClockTextColor = sharedPreferences.getInt("clock_text_color", Color.BLACK)
+        val currentClockTextColor = sharedPreferences.getInt("clock_text_color", R.color.icon_color)
 
         Log.d("josephDebug", "currentClockTextColor: $currentClockTextColor")
 

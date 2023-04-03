@@ -28,15 +28,14 @@
             android:text="00:00:00"
             android:padding="2dp"
             android:elevation="6dp"
-            android:textColor="@color/clockTextColor"
+            android:textColor="@color/icon_color"
             android:textStyle="bold"
             android:shadowColor="#000000"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="6"
             android:lineSpacingExtra="0sp"
-            android:lineSpacingMultiplier="1"
-        />
+            android:lineSpacingMultiplier="1" />
 
     </FrameLayout>
 
@@ -51,7 +50,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:src="@drawable/setting_icon" />
+        android:src="@drawable/setting_icon"
+        app:tint="@color/icon_color" />
 
 
 
