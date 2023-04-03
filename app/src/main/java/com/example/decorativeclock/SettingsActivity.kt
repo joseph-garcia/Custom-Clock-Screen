@@ -13,12 +13,15 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.yalantis.ucrop.UCrop
 import java.io.File
 import java.io.FileOutputStream
+import com.example.decorativeclock.R
+
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -35,8 +38,11 @@ class SettingsActivity : AppCompatActivity() {
         "Serif" to "serif",
         "Monospace" to "monospace",
         "Cursive" to "cursive",
-        "Fantasy" to "fantasy"
+        "Fantasy" to "fantasy",
+        "Press Start" to "pressstart2p_regular"
     )
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,9 +74,11 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+//        // Initialize fontSpinner and set the current font as the selected item
+//        fontSpinner = findViewById(R.id.font_spinner)
 
 
-        fontSpinner = findViewById(R.id.font_spinner)
+
         previewTextView = findViewById(R.id.preview_text_view)
         val saveFontButton: Button = findViewById(R.id.save_font_button)
 
@@ -85,21 +93,45 @@ class SettingsActivity : AppCompatActivity() {
         // Set the initial color for the color picker view
         colorPickerView.setInitialColor(currentClockTextColor)
 
+
+
+        // Initialize fontSpinner
+        fontSpinner = findViewById(R.id.font_spinner)
         val fontAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fontMap.keys.toList())
         fontAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         fontSpinner.adapter = fontAdapter
 
+        // Retrieve the current clock font from shared preferences
+        val currentClockFont = sharedPreferences.getString("clock_font", "sans-serif")
+
+        // Find the position of the current font in the spinner
+        val currentFontPosition = fontMap.entries.indexOfFirst { it.value == currentClockFont }
+
+        // Set the spinner's selected item to the current font
+        if (currentFontPosition != -1) {
+            fontSpinner.setSelection(currentFontPosition)
+        }
+
         fontSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
+                val defaultFonts = listOf("sans-serif", "serif", "monospace", "cursive", "fantasy")
                 if (selectedFont != null) {
-                    previewTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
+                    if (defaultFonts.contains(selectedFont)) {
+                        previewTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
+                    } else {
+                        val fontResourceId = resources.getIdentifier(selectedFont, "font", packageName)
+                        val customTypeface = ResourcesCompat.getFont(this@SettingsActivity, fontResourceId)
+                        previewTextView.typeface = customTypeface
+                    }
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+
+
 
         colorPickerView.setColorListener(object : ColorEnvelopeListener {
             override fun onColorSelected(envelope: ColorEnvelope, fromUser: Boolean) {
@@ -116,6 +148,7 @@ class SettingsActivity : AppCompatActivity() {
             val editor = sharedPreferences.edit()
             val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
             val selectedColor = colorPickerView.colorEnvelope.color
+            Log.d("josephDebug", "in saveFontButton, font is $selectedFont ")
             if (selectedFont != null) {
                 editor.putString("clock_font", selectedFont)
                 editor.putInt("clock_text_color", selectedColor)

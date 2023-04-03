@@ -24,6 +24,8 @@ import com.yalantis.ucrop.UCrop
 import android.graphics.Point
 import android.graphics.Typeface
 import android.os.*
+import android.util.Log
+import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -470,14 +472,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadClockSettings() {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
-        val font = sharedPreferences.getString("clock_font", "sans-serif")
+        val selectedFont = sharedPreferences.getString("clock_font", "sans-serif")
         val textColor = sharedPreferences.getInt("clock_text_color", Color.BLACK)
 
-        clockTextView.typeface = Typeface.create(font, Typeface.NORMAL)
+        if (selectedFont == "pressstart2p_regular") {
+            val customTypeface = ResourcesCompat.getFont(this, R.font.pressstart2p_regular)
+            clockTextView.typeface = customTypeface
+        } else {
+            clockTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
+        }
+
         clockTextView.setTextColor(textColor)
     }
 
 
+
+
 }
+
+
 
 data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)

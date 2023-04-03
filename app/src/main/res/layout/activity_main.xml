@@ -33,6 +33,8 @@
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="6"
+            android:lineSpacingExtra="0sp"
+            android:lineSpacingMultiplier="1"
         />
 
     </FrameLayout>
