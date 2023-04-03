@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DecorativeClock</string>
+    <string name="guide_text">Reposition: Click Drag\nRotate: Double Tap\nReset Position: Long Press</string>
 </resources>

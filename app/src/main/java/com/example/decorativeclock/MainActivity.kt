@@ -26,6 +26,7 @@ import android.graphics.Typeface
 import android.os.*
 import android.util.Log
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -195,7 +196,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
+        updateDropShadow()
         loadClockSettings()
     }
 
@@ -420,6 +421,7 @@ class MainActivity : AppCompatActivity() {
         val clockTextView = findViewById<TextView>(R.id.clockTextView)
         clockTextView.typeface = Typeface.create(clockFont, Typeface.NORMAL)
 
+        updateDropShadow()
         loadClockSettings()
         clockTextView.post(updateTimeRunnable)
     }
@@ -488,8 +490,8 @@ class MainActivity : AppCompatActivity() {
     private fun loadClockSettings() {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
         val selectedFont = sharedPreferences.getString("clock_font", "sans-serif")
-        val textColor = sharedPreferences.getInt("clock_text_color", R.color.icon_color)
-        Log.d("josephDebug", "default color: ${R.color.icon_color}")
+        val textColor = sharedPreferences.getInt("clock_text_color", ContextCompat.getColor(this, R.color.icon_color))
+        Log.d("josephDebug", "default color: ${ContextCompat.getColor(this, R.color.icon_color)}")
 
         if (selectedFont == "pressstart2p_regular") {
             val customTypeface = ResourcesCompat.getFont(this, R.font.pressstart2p_regular)
@@ -501,6 +503,17 @@ class MainActivity : AppCompatActivity() {
         clockTextView.setTextColor(textColor)
     }
 
+
+    private fun updateDropShadow() {
+        val sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
+        val isDropShadowEnabled = sharedPreferences.getBoolean("is_drop_shadow_enabled", true)
+
+        if (isDropShadowEnabled) {
+            clockTextView.setShadowLayer(6f, 2f, 2f, Color.BLACK)
+        } else {
+            clockTextView.setShadowLayer(0f, 0f, 0f, Color.BLACK)
+        }
+    }
 
 
 

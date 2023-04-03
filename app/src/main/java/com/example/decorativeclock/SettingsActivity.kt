@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
@@ -42,12 +43,9 @@ class SettingsActivity : AppCompatActivity() {
         "Press Start" to "pressstart2p_regular"
     )
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-
 
         // listen for change background button click
         val changeBackgroundButton = findViewById<Button>(R.id.changeBackgroundButton)
@@ -69,8 +67,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-
-
         previewTextView = findViewById(R.id.preview_text_view)
         val saveFontButton: Button = findViewById(R.id.save_font_button)
 
@@ -78,14 +74,13 @@ class SettingsActivity : AppCompatActivity() {
         colorPickerView = findViewById(R.id.color_picker_view)
 
         // Retrieve the current clock text color from shared preferences
-        val currentClockTextColor = sharedPreferences.getInt("clock_text_color", R.color.icon_color)
+        val defaultClockTextColor = ContextCompat.getColor(this, R.color.icon_color)
+        val currentClockTextColor = sharedPreferences.getInt("clock_text_color", defaultClockTextColor)
 
         Log.d("josephDebug", "currentClockTextColor: $currentClockTextColor")
 
         // Set the initial color for the color picker view
         colorPickerView.setInitialColor(currentClockTextColor)
-
-
 
         // Initialize fontSpinner
         fontSpinner = findViewById(R.id.font_spinner)
@@ -123,17 +118,11 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-
-
         colorPickerView.setColorListener(object : ColorEnvelopeListener {
             override fun onColorSelected(envelope: ColorEnvelope, fromUser: Boolean) {
                 previewTextView.setTextColor(envelope.color)
             }
         })
-
-
-
-
 
         saveFontButton.setOnClickListener {
             val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
@@ -149,18 +138,30 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
+        // Drop Shadow
+        val toggleDropShadowSwitch: Switch = findViewById(R.id.toggleDropShadowSwitch)
+
+        val isDropShadowEnabled = sharedPreferences.getBoolean("is_drop_shadow_enabled", true)
+        toggleDropShadowSwitch.isChecked = isDropShadowEnabled
+
+        toggleDropShadowSwitch.setOnCheckedChangeListener { _, isChecked ->
+            val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putBoolean("is_drop_shadow_enabled", isChecked)
+                apply()
+            }
+        }
+
+
     }
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, IMAGE_PICK_REQUEST_CODE)
     }
-
-
     companion object {
         const val IMAGE_PICK_REQUEST_CODE = 1001
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -188,8 +189,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
-
-
     private fun saveCroppedImageUri(uri: Uri) {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -205,18 +204,8 @@ class SettingsActivity : AppCompatActivity() {
         editor.putString("background_image_uri", backgroundFile.absolutePath)
         editor.apply()
     }
-
     private fun isGifFile(context: Context, uri: Uri): Boolean {
         val mimeType: String? = context.contentResolver.getType(uri)
         return mimeType?.equals("image/gif", ignoreCase = true) == true
     }
-
-
-
-
-
-
-
-
-
 }

@@ -21,6 +21,14 @@
         android:layout_gravity="center_horizontal"
         android:text="Toggle Military Time" />
 
+    <Switch
+        android:id="@+id/toggleDropShadowSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Drop Shadow"
+        android:checked="true" />
+
+
     <Spinner
         android:id="@+id/font_spinner"
         android:layout_width="match_parent"
@@ -53,5 +61,16 @@
         android:layout_height="wrap_content"
         android:text="Save" />
 
+
+    <TextView
+        android:id="@+id/guide_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:text="@string/guide_text"
+        android:gravity="center"
+        android:textSize="30sp"
+        />
 
 </LinearLayout>
