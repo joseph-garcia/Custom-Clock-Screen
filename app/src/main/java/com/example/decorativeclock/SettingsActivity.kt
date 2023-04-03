@@ -20,7 +20,7 @@ import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.yalantis.ucrop.UCrop
 import java.io.File
 import java.io.FileOutputStream
-import com.example.decorativeclock.R
+
 
 
 
@@ -47,6 +47,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
 
         // listen for change background button click
         val changeBackgroundButton = findViewById<Button>(R.id.changeBackgroundButton)

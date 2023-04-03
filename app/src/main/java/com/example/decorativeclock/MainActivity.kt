@@ -25,6 +25,7 @@ import android.graphics.Point
 import android.graphics.Typeface
 import android.os.*
 import android.util.Log
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -32,6 +33,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
+import androidx.lifecycle.Observer
 
 
 class MainActivity : AppCompatActivity() {
@@ -79,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         val timer = object : CountDownTimer(Long.MAX_VALUE, 1000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -172,21 +175,27 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_MOVE -> {
                     val newX = event.rawX + dX
                     val newY = event.rawY + dY
-
-                    val minX = 0f
-                    val minY = 0f
-                    val maxX = resources.displayMetrics.widthPixels - view.width.toFloat()
-                    val maxY = resources.displayMetrics.heightPixels - view.height.toFloat()
-
-                    view.x = newX.coerceIn(minX, maxX)
-                    view.y = newY.coerceIn(minY, maxY)
+                    view.x = newX
+                    view.y = newY
                 }
+
+
                 MotionEvent.ACTION_UP -> {
                     saveClockPosition(view.x, view.y, scaleFactor)
                 }
             }
             true
         }
+
+        // Run resetClockPosition() on long press anywhere outside of the clock
+        val mainLayout = findViewById<RelativeLayout>(R.id.root_layout)
+        mainLayout.setOnLongClickListener {
+            resetClockPosition()
+            true
+        }
+
+
+
         loadClockSettings()
     }
 
@@ -318,9 +327,15 @@ class MainActivity : AppCompatActivity() {
         outState.putFloat("y", clockTextView.y)
         outState.putFloat("scaleFactor", scaleFactor)
     }
-    private fun resetClockPosition() {
+    fun resetClockPosition() {
+        Log.d("josephDebug", "resetClockPosition running")
+        // Reset the clock position
         clockTextView.x = (resources.displayMetrics.widthPixels - clockTextView.width) / 2f
         clockTextView.y = (resources.displayMetrics.heightPixels - clockTextView.height) / 2f
+
+        // Reset the clock rotation
+        clockTextView.rotation = 0f
+
         saveClockPosition(clockTextView.x, clockTextView.y, 1.0f)
     }
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
