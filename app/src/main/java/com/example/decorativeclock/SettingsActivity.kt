@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -18,6 +19,8 @@ import androidx.core.content.res.ResourcesCompat
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+import com.skydoves.colorpickerview.sliders.AlphaSlideBar
+import com.skydoves.colorpickerview.sliders.BrightnessSlideBar
 import com.yalantis.ucrop.UCrop
 import java.io.File
 import java.io.FileOutputStream
@@ -47,6 +50,10 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        // initialize settings_layout LinearLayout to be scrollable
+        val settingsLayout: LinearLayout = findViewById(R.id.settings_layout)
+
+
         // listen for change background button click
         val changeBackgroundButton = findViewById<Button>(R.id.changeBackgroundButton)
         changeBackgroundButton.setOnClickListener {
@@ -72,6 +79,9 @@ class SettingsActivity : AppCompatActivity() {
 
         // Initialize colorPickerView
         colorPickerView = findViewById(R.id.color_picker_view)
+
+
+
 
         // Retrieve the current clock text color from shared preferences
         val defaultClockTextColor = ContextCompat.getColor(this, R.color.icon_color)
@@ -152,6 +162,14 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        colorPickerView.post {
+            // Attach AlphaSliderBar and BrightnessSliderBar to colorPickerView
+            val alphaSlideBar = findViewById<AlphaSlideBar>(R.id.alphaSlideBar)
+            colorPickerView.attachAlphaSlider(alphaSlideBar)
+
+            val brightnessSlideBar = findViewById<BrightnessSlideBar>(R.id.brightnessSlideBar)
+            colorPickerView.attachBrightnessSlider(brightnessSlideBar)
+        }
 
     }
 
