@@ -8,13 +8,11 @@ import android.graphics.Point
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -65,13 +63,9 @@ class SettingsActivity : AppCompatActivity() {
         toggleMilitaryTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
             val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
             with(sharedPreferences.edit()) {
-                putBoolean("military_time", isChecked)
+                putBoolean("is_military_time", isChecked)
                 apply()
             }
-            // Restart MainActivity to apply changes
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
         }
 
 

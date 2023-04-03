@@ -2,7 +2,6 @@ package com.example.decorativeclock
 
 
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -10,9 +9,6 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -27,17 +23,28 @@ import kotlin.math.min
 import com.yalantis.ucrop.UCrop
 import android.graphics.Point
 import android.graphics.Typeface
+import android.os.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
 
 
 class MainActivity : AppCompatActivity() {
 
     // Initialize clockTextView
     private lateinit var clockTextView: TextView
+    private var timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+
+    private val updateTimeRunnable = object : Runnable {
+        override fun run() {
+            updateTime()
+            clockTextView.postDelayed(this, 1000)
+        }
+    }
+
     private lateinit var gestureDetector: GestureDetector
 
     // Initialize scaleGestureDetector for pinch-to-resize
@@ -70,6 +77,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val timer = object : CountDownTimer(Long.MAX_VALUE, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                updateTime()
+            }
+
+            override fun onFinish() {
+            }
+        }
+        timer.start()
 
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
         val isMilitaryTime = sharedPreferences.getBoolean("military_time", false)
@@ -136,6 +153,11 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        clockTextView.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
         clockTextView.setOnTouchListener { view, event ->
             scaleGestureDetector.onTouchEvent(event)
             gestureDetector.onTouchEvent(event)
@@ -165,6 +187,36 @@ class MainActivity : AppCompatActivity() {
         }
         loadClockSettings()
     }
+
+    fun updateClockTimeFormat()  {
+        val sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
+        val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
+
+        if (isMilitaryTime) {
+            timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        } else {
+            timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        }
+
+        updateTime()
+    }
+
+    private fun updateTime() {
+        val sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
+        val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
+
+        val currentTime = Calendar.getInstance().time
+        val timeFormat = if (isMilitaryTime) {
+            SimpleDateFormat("HH:mm", Locale.getDefault())
+        } else {
+            SimpleDateFormat("hh:mm a", Locale.getDefault())
+        }
+        val formattedTime = timeFormat.format(currentTime)
+
+        clockTextView.text = formattedTime
+    }
+
+
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupFadeInFadeOutBehavior() {
@@ -340,6 +392,7 @@ class MainActivity : AppCompatActivity() {
     // Add this method to save the background image URI
     override fun onResume() {
         super.onResume()
+        updateClockTimeFormat()
         val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
         if (backgroundImageUriString != null) {
             val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
@@ -351,6 +404,12 @@ class MainActivity : AppCompatActivity() {
         clockTextView.typeface = Typeface.create(clockFont, Typeface.NORMAL)
 
         loadClockSettings()
+        clockTextView.post(updateTimeRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        clockTextView.removeCallbacks(updateTimeRunnable)
     }
     private fun setBackgroundImage(resultUri: Uri) {
         val backgroundImageView = findViewById<ImageView>(R.id.background_image)
