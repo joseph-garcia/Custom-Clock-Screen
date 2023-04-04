@@ -1,95 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/settings_layout"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="16dp"
     tools:context=".SettingsActivity">
 
-    <Button
-        android:id="@+id/changeBackgroundButton"
+    <LinearLayout
+        android:id="@+id/settings_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Change Background" />
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/changeBackgroundButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Change Background" />
 
 
-    <Switch
-        android:id="@+id/toggleMilitaryTimeSwitch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Toggle Military Time" />
+        <Switch
+            android:id="@+id/toggleMilitaryTimeSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Toggle Military Time" />
 
-    <Switch
-        android:id="@+id/toggleDropShadowSwitch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Drop Shadow"
-        android:checked="true" />
-
-
-    <Spinner
-        android:id="@+id/font_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp" />
-
-    <com.skydoves.colorpickerview.ColorPickerView
-        android:id="@+id/color_picker_view"
-        android:layout_width="300dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_height="300dp" />
-
-    <com.skydoves.colorpickerview.sliders.AlphaSlideBar
-        android:id="@+id/alphaSlideBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:selector_AlphaSlideBar="@drawable/wheel"
-        app:borderColor_AlphaSlideBar="@android:color/darker_gray"
-        app:borderSize_AlphaSlideBar="5"/>
-
-    <com.skydoves.colorpickerview.sliders.BrightnessSlideBar
-        android:id="@+id/brightnessSlideBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:selector_BrightnessSlider="@drawable/wheel"
-        app:borderColor_BrightnessSlider="@android:color/darker_gray"
-        app:borderSize_BrightnessSlider="5"/>
+        <Switch
+            android:id="@+id/toggleDropShadowSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Drop Shadow"
+            android:checked="true" />
 
 
+        <Spinner
+            android:id="@+id/font_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:id="@+id/preview_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:text="12:34 AM"
-        android:textSize="30sp"
-        />
+        <com.skydoves.colorpickerview.ColorPickerView
+            android:id="@+id/color_picker_view"
+            android:layout_width="260dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="260dp"
+            android:layout_marginBottom="30dp"/>
+
+        <com.skydoves.colorpickerview.sliders.AlphaSlideBar
+            android:id="@+id/alphaSlideBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:selector_AlphaSlideBar="@drawable/wheel"
+            app:borderColor_AlphaSlideBar="@android:color/darker_gray"
+            app:borderSize_AlphaSlideBar="5"
+            android:layout_marginBottom="3dp"/>
+
+        <com.skydoves.colorpickerview.sliders.BrightnessSlideBar
+            android:id="@+id/brightnessSlideBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:selector_BrightnessSlider="@drawable/wheel"
+            app:borderColor_BrightnessSlider="@android:color/darker_gray"
+            app:borderSize_BrightnessSlider="5"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="1dp"
+            android:text="Clock Preview"/>
+
+        <TextView
+            android:id="@+id/preview_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:text="12:34 AM"
+            android:textSize="30sp"
+            />
 
 
 
-    <Button
-        android:id="@+id/save_font_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save" />
+        <Button
+            android:id="@+id/save_font_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save" />
 
 
-    <TextView
-        android:id="@+id/guide_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:text="@string/guide_text"
-        android:gravity="center"
-        android:textSize="30sp"
-        />
+        <TextView
+            android:id="@+id/guide_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:text="@string/guide_text"
+            android:gravity="center"
+            android:textSize="30sp"
+            />
 
-</LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

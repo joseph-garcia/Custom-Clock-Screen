@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -65,14 +66,21 @@ class SettingsActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
         val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
         toggleMilitaryTimeSwitch.isChecked = isMilitaryTime
+        var newIsMilitaryTime = isMilitaryTime
+
+
 
         toggleMilitaryTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
-            with(sharedPreferences.edit()) {
-                putBoolean("is_military_time", isChecked)
-                apply()
+            newIsMilitaryTime = isChecked
+            // if military time is enabled, add to previewTextView, if not, remove from previewTextView
+            if (isChecked) {
+                previewTextView.text = "13:34"
+            } else {
+                previewTextView.text = "01:34 PM"
             }
         }
+
+        // my package name is com.example.decorativeclock
 
         previewTextView = findViewById(R.id.preview_text_view)
         val saveFontButton: Button = findViewById(R.id.save_font_button)
@@ -91,6 +99,62 @@ class SettingsActivity : AppCompatActivity() {
 
         // Set the initial color for the color picker view
         colorPickerView.setInitialColor(currentClockTextColor)
+
+        val colorPickerView = findViewById<ColorPickerView>(R.id.color_picker_view)
+        val scrollView = findViewById<ScrollView>(R.id.scrollView)
+        // Disable scrolling on the color picker view when the user is interacting with it
+        colorPickerView.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Disallow ScrollView to intercept touch events when interacting with the ColorPickerView
+                    scrollView.requestDisallowInterceptTouchEvent(true)
+                    false
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Allow ScrollView to intercept touch events after interaction with the ColorPickerView
+                    scrollView.requestDisallowInterceptTouchEvent(false)
+                    false
+                }
+                else -> false
+            }
+        }
+
+        // Disable scrolling on the brightness slider when the user is interacting with it
+        val brightnessSlideBar = findViewById<BrightnessSlideBar>(R.id.brightnessSlideBar)
+        brightnessSlideBar.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Disallow ScrollView to intercept touch events when interacting with the ColorPickerView
+                    scrollView.requestDisallowInterceptTouchEvent(true)
+                    false
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Allow ScrollView to intercept touch events after interaction with the ColorPickerView
+                    scrollView.requestDisallowInterceptTouchEvent(false)
+                    false
+                }
+                else -> false
+            }
+        }
+
+        // Disable scrolling on the alpha slider when the user is interacting with it
+        val alphaSlideBar = findViewById<AlphaSlideBar>(R.id.alphaSlideBar)
+        alphaSlideBar.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Disallow ScrollView to intercept touch events when interacting with the ColorPickerView
+                    scrollView.requestDisallowInterceptTouchEvent(true)
+                    false
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Allow ScrollView to intercept touch events after interaction with the ColorPickerView
+                    scrollView.requestDisallowInterceptTouchEvent(false)
+                    false
+                }
+                else -> false
+            }
+        }
+
 
         // Initialize fontSpinner
         fontSpinner = findViewById(R.id.font_spinner)
@@ -134,18 +198,12 @@ class SettingsActivity : AppCompatActivity() {
             }
         })
 
-        saveFontButton.setOnClickListener {
-            val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
-            val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
-            val selectedColor = colorPickerView.colorEnvelope.color
-            Log.d("josephDebug", "in saveFontButton, font is $selectedFont ")
-            if (selectedFont != null) {
-                editor.putString("clock_font", selectedFont)
-                editor.putInt("clock_text_color", selectedColor)
-                editor.apply()
-            }
-            finish()
+
+        // if military time is enabled, add to previewTextView, if not, remove from previewTextView
+        if (isMilitaryTime) {
+            previewTextView.text = "13:34"
+        } else {
+            previewTextView.text = "01:34 PM"
         }
 
         // Drop Shadow
@@ -153,12 +211,23 @@ class SettingsActivity : AppCompatActivity() {
 
         val isDropShadowEnabled = sharedPreferences.getBoolean("is_drop_shadow_enabled", true)
         toggleDropShadowSwitch.isChecked = isDropShadowEnabled
+        // if drop shadow is enabled, add to previewTextView, if not, remove from previewTextView
+        if (isDropShadowEnabled) {
+            addDropShadow(previewTextView)
+        } else {
+            removeDropShadow(previewTextView)
+        }
+
+        var newIsDropShadowEnabled = isDropShadowEnabled
 
         toggleDropShadowSwitch.setOnCheckedChangeListener { _, isChecked ->
-            val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
-            with(sharedPreferences.edit()) {
-                putBoolean("is_drop_shadow_enabled", isChecked)
-                apply()
+            newIsDropShadowEnabled = isChecked
+            if (isChecked) {
+                // Add drop shadow to both previewTextView and clockTextView
+                addDropShadow(previewTextView)
+            } else {
+                // Remove drop shadow from both previewTextView and clockTextView
+                removeDropShadow(previewTextView)
             }
         }
 
@@ -169,6 +238,23 @@ class SettingsActivity : AppCompatActivity() {
 
             val brightnessSlideBar = findViewById<BrightnessSlideBar>(R.id.brightnessSlideBar)
             colorPickerView.attachBrightnessSlider(brightnessSlideBar)
+        }
+
+        saveFontButton.setOnClickListener {
+            val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
+            val selectedColor = colorPickerView.colorEnvelope.color
+
+            if (selectedFont != null) {
+                editor.putString("clock_font", selectedFont)
+                editor.putInt("clock_text_color", selectedColor)
+                // Save the state of the switches
+                editor.putBoolean("is_military_time", newIsMilitaryTime)
+                editor.putBoolean("is_drop_shadow_enabled", newIsDropShadowEnabled)
+                editor.apply()
+            }
+            finish()
         }
 
     }
@@ -225,5 +311,13 @@ class SettingsActivity : AppCompatActivity() {
     private fun isGifFile(context: Context, uri: Uri): Boolean {
         val mimeType: String? = context.contentResolver.getType(uri)
         return mimeType?.equals("image/gif", ignoreCase = true) == true
+    }
+
+    private fun addDropShadow(textView: TextView) {
+        textView.setShadowLayer(6f, 2f, 2f, Color.BLACK)
+    }
+
+    private fun removeDropShadow(textView: TextView) {
+        textView.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT)
     }
 }
