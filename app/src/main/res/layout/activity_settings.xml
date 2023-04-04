@@ -33,10 +33,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Drop Shadow"
-            android:checked="true" />
+            android:checked="true"
+            android:layout_marginBottom="8dp"/>
 
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="1dp"
+            android:text="Change Font"/>
         <Spinner
+
             android:id="@+id/font_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,7 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="1dp"
+            android:layout_marginBottom="3dp"
             android:text="Clock Preview"/>
 
         <TextView
