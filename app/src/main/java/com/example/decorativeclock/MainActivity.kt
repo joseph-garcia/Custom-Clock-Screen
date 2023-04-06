@@ -45,27 +45,19 @@ class MainActivity : AppCompatActivity() {
 
     private val updateTimeRunnable = object : Runnable {
         override fun run() {
-            updateTime()
             clockTextView.postDelayed(this, 1000)
         }
     }
 
-    private lateinit var gestureDetector: GestureDetector
-
-    // Initialize scaleGestureDetector for pinch-to-resize
-    private lateinit var scaleGestureDetector: ScaleGestureDetector
-    private var scaleFactor = 1f
     private var isRotating = false
-
-    // Initialize variables for dragging the clock
-    private var dX = 0f
-    private var dY = 0f
 
     // Initialize optionsIcon and fadeHandler for fading in/out the options icon
     private lateinit var optionsIcon: ImageView
     private val fadeHandler = Handler(Looper.getMainLooper())
     private var statusBarHeight = 0
     private val fadeOutHandler = Handler(Looper.getMainLooper())
+
+    private lateinit var gestureDetector: GestureDetector
 
     // Initialize notificationBarHandler for fading in/out the notification bar
     private val notificationBarHandler = Handler(Looper.getMainLooper())
@@ -84,15 +76,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        val timer = object : CountDownTimer(Long.MAX_VALUE, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                updateTime()
-            }
 
-            override fun onFinish() {
-            }
-        }
-        timer.start()
 
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
         val isMilitaryTime = sharedPreferences.getBoolean("military_time", false)
@@ -112,18 +96,6 @@ class MainActivity : AppCompatActivity() {
         setupFadeInFadeOutBehavior()
 
         clockTextView = findViewById(R.id.clockTextView)
-        scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
-
-        val handler = Handler(Looper.getMainLooper())
-
-        val updateClockRunnable = object : Runnable {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun run() {
-                updateClock(isMilitaryTime)
-                handler.postDelayed(this, 60000)
-            }
-        }
-        handler.post(updateClockRunnable)
 
         // Gesture detector for rotating the clock
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
@@ -135,58 +107,32 @@ class MainActivity : AppCompatActivity() {
 
         // Load and set the saved clock data (position and scale factor)
         val clockData = loadClockPosition()
-        scaleFactor = clockData.third
-        clockTextView.scaleX = scaleFactor
-        clockTextView.scaleY = scaleFactor
 
-        clockTextView.viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                clockTextView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+        // Set the clock text size
+//        clockTextView.viewTreeObserver.addOnGlobalLayoutListener(object :
+//            ViewTreeObserver.OnGlobalLayoutListener {
+//            override fun onGlobalLayout() {
+//                clockTextView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+//
+//                val minX = 0f
+//                val minY = 0f
+//                val maxX = resources.displayMetrics.widthPixels - clockTextView.width.toFloat()
+//                val maxY = resources.displayMetrics.heightPixels - clockTextView.height.toFloat()
+//
+//                if (clockData.first != -1f && clockData.second != -1f) {
+//                    clockTextView.x = clockData.first.coerceIn(minX, maxX)
+//                    clockTextView.y = clockData.second.coerceIn(minY, maxY)
+//                    clockTextView.rotation = clockData.fourth
+//                } else {
+//                    resetClockPosition()
+//                }
+//            }
+//        })
 
-                val minX = 0f
-                val minY = 0f
-                val maxX = resources.displayMetrics.widthPixels - clockTextView.width.toFloat()
-                val maxY = resources.displayMetrics.heightPixels - clockTextView.height.toFloat()
-
-                if (clockData.first != -1f && clockData.second != -1f) {
-                    clockTextView.x = clockData.first.coerceIn(minX, maxX)
-                    clockTextView.y = clockData.second.coerceIn(minY, maxY)
-                    clockTextView.rotation = clockData.fourth
-                } else {
-                    resetClockPosition()
-                }
-            }
-        })
-
-        clockTextView.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        }
-
-        clockTextView.setOnTouchListener { view, event ->
-            scaleGestureDetector.onTouchEvent(event)
-            gestureDetector.onTouchEvent(event)
-
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    dX = view.x - event.rawX
-                    dY = view.y - event.rawY
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val newX = event.rawX + dX
-                    val newY = event.rawY + dY
-                    view.x = newX
-                    view.y = newY
-                }
-
-
-                MotionEvent.ACTION_UP -> {
-                    saveClockPosition(view.x, view.y, scaleFactor)
-                }
-            }
-            true
-        }
+//        clockTextView.setOnClickListener {
+//            val intent = Intent(this, SettingsActivity::class.java)
+//            startActivity(intent)
+//        }
 
         // Run resetClockPosition() on long press anywhere outside of the clock
         val mainLayout = findViewById<RelativeLayout>(R.id.root_layout)
@@ -194,39 +140,11 @@ class MainActivity : AppCompatActivity() {
             resetClockPosition()
             true
         }
-
-
         updateDropShadow()
         loadClockSettings()
     }
 
-    fun updateClockTimeFormat()  {
-        val sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
-        val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
 
-        if (isMilitaryTime) {
-            timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        } else {
-            timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        }
-
-        updateTime()
-    }
-
-    private fun updateTime() {
-        val sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
-        val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
-
-        val currentTime = Calendar.getInstance().time
-        val timeFormat = if (isMilitaryTime) {
-            SimpleDateFormat("HH:mm", Locale.getDefault())
-        } else {
-            SimpleDateFormat("hh:mm a", Locale.getDefault())
-        }
-        val formattedTime = timeFormat.format(currentTime)
-
-        clockTextView.text = formattedTime
-    }
 
 
 
@@ -326,7 +244,6 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         outState.putFloat("x", clockTextView.x)
         outState.putFloat("y", clockTextView.y)
-        outState.putFloat("scaleFactor", scaleFactor)
     }
     fun resetClockPosition() {
         Log.d("josephDebug", "resetClockPosition running")
@@ -337,19 +254,9 @@ class MainActivity : AppCompatActivity() {
         // Reset the clock rotation
         clockTextView.rotation = 0f
 
-        saveClockPosition(clockTextView.x, clockTextView.y, 1.0f)
+        saveClockPosition(clockTextView.x, clockTextView.y)
     }
-    private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-        override fun onScale(detector: ScaleGestureDetector): Boolean {
-            scaleFactor *= detector.scaleFactor
-            scaleFactor = max(0.1f, min(scaleFactor, 5.0f))
-            clockTextView.scaleX = scaleFactor
-            clockTextView.scaleY = scaleFactor
-            saveClockPosition(clockTextView.x, clockTextView.y, scaleFactor)
-            return true
-        }
-    }
-    private fun saveClockPosition(x: Float, y: Float, scaleFactor: Float) {
+    private fun saveClockPosition(x: Float, y: Float) {
         val sharedPreferences = getSharedPreferences("clock_data", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val orientation = resources.configuration.orientation
@@ -357,7 +264,7 @@ class MainActivity : AppCompatActivity() {
 
         editor.putFloat("${orientationKey}_x", x)
         editor.putFloat("${orientationKey}_y", y)
-        editor.putFloat("${orientationKey}_scaleFactor", scaleFactor)
+        //editor.putFloat("${orientationKey}_scaleFactor", scaleFactor)
         editor.putFloat("${orientationKey}_rotation", clockTextView.rotation)
         editor.apply()
     }
@@ -381,23 +288,23 @@ class MainActivity : AppCompatActivity() {
                 .setDuration(500)
                 .withEndAction {
                     isRotating = false
-                    saveClockPosition(clockTextView.x, clockTextView.y, scaleFactor)
+                    saveClockPosition(clockTextView.x, clockTextView.y)
                 }
                 .start()
         }
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    fun updateClock(isMilitaryTime: Boolean) {
-        if (!::clockTextView.isInitialized) return
-
-        val currentTime = LocalDateTime.now()
-        val formattedTime = if (isMilitaryTime) {
-            currentTime.format(DateTimeFormatter.ofPattern("HH:mm"))
-        } else {
-            currentTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
-        }
-        clockTextView.text = formattedTime
-    }
+//    fun updateClock(isMilitaryTime: Boolean) {
+//        if (!::clockTextView.isInitialized) return
+//
+//        val currentTime = LocalDateTime.now()
+//        val formattedTime = if (isMilitaryTime) {
+//            currentTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+//        } else {
+//            currentTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
+//        }
+//        clockTextView.text = formattedTime
+//    }
     // Add this method to get the status bar height for the options icon
     private fun getStatusBarHeight(): Int {
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
@@ -410,7 +317,6 @@ class MainActivity : AppCompatActivity() {
     // Add this method to save the background image URI
     override fun onResume() {
         super.onResume()
-        updateClockTimeFormat()
         val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
         if (backgroundImageUriString != null) {
             val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
@@ -494,7 +400,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("josephDebug", "default color: ${ContextCompat.getColor(this, R.color.icon_color)}")
 
         if (selectedFont == "pressstart2p_regular") {
-            val customTypeface = ResourcesCompat.getFont(this, R.font.pressstart2p_regular)
+            val customTypeface = ResourcesCompat.getFont(this, R.font.pressstart_regular)
             clockTextView.typeface = customTypeface
         } else {
             clockTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)

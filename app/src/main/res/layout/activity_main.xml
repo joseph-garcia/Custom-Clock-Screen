@@ -19,12 +19,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
+        <com.example.decorativeclock.ResizableClockTextView
             android:id="@+id/clockTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="30sp"
+            android:gravity="center"
+            android:textSize="50sp"
             android:text="00:00:00"
             android:padding="2dp"
             android:elevation="6dp"
@@ -35,8 +36,8 @@
             android:shadowDy="2"
             android:shadowRadius="6"
             android:lineSpacingExtra="0sp"
+            android:backgroundTint="@color/black"
             android:lineSpacingMultiplier="1" />
-
     </FrameLayout>
 
 
