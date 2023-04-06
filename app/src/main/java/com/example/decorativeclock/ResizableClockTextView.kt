@@ -2,6 +2,7 @@ package com.example.decorativeclock
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.GestureDetector
 import android.view.ScaleGestureDetector
@@ -19,13 +20,15 @@ class ResizableClockTextView @JvmOverloads constructor(
 ) : TextClock(context, attrs, defStyleAttr) {
 
     private val scaleDetector: ScaleGestureDetector
-    private val originalTextSize = textSize
+    private val originalTextSize = 50f;
 
     private var lastTouchX = 0f
     private var lastTouchY = 0f
 
     init {
         scaleDetector = ScaleGestureDetector(context, ScaleListener())
+        var initialTextSize = textSize
+
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -58,20 +61,17 @@ class ResizableClockTextView @JvmOverloads constructor(
     }
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-        private val initialTextSize: Float = textSize
-        private var accumulatedScaleFactor = 1f
+        private var scaleFactor = 1f
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
-            accumulatedScaleFactor *= detector.scaleFactor
-            accumulatedScaleFactor = accumulatedScaleFactor.coerceAtLeast(0.1f).coerceAtMost(5.0f)
+            scaleFactor *= detector.scaleFactor
+            scaleFactor = scaleFactor.coerceAtLeast(0.1f).coerceAtMost(5.0f)
 
-            val newSize = initialTextSize * accumulatedScaleFactor
+            val newSize = originalTextSize * scaleFactor
             textSize = newSize.coerceAtLeast(10f).coerceAtMost(500f)
             return true
         }
     }
-
-
 }
 
 

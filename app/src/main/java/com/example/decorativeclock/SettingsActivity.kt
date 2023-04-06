@@ -250,7 +250,7 @@ class SettingsActivity : AppCompatActivity() {
                 editor.putString("clock_font", selectedFont)
                 editor.putInt("clock_text_color", selectedColor)
                 // Save the state of the switches
-                editor.putBoolean("is_military_time", newIsMilitaryTime)
+                //editor.putBoolean("is_military_time", newIsMilitaryTime)
                 editor.putBoolean("is_drop_shadow_enabled", newIsDropShadowEnabled)
                 editor.apply()
             }

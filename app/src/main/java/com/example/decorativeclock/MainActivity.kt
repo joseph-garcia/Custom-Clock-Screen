@@ -75,6 +75,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // initialize gesture detector to override later
+//        val doubleTapGestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+//            override fun onDoubleTap(e: MotionEvent): Boolean {
+//                Log.d("josephDebug", "DOUBLE TAPPING")
+//                rotateClockTextView()
+//                return true
+//            }
+//        })
+
+
 
 
 
@@ -100,10 +110,17 @@ class MainActivity : AppCompatActivity() {
         // Gesture detector for rotating the clock
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDoubleTap(e: MotionEvent): Boolean {
+                Log.d("josephDebug", "DOUBLE TAPPING")
                 rotateClockTextView()
                 return true
             }
         })
+
+        // listen for gesture detector
+//        clockTextView.setOnTouchListener { _, event ->
+//            doubleTapGestureDetector.onTouchEvent(event)
+//            true
+//        }
 
         // Load and set the saved clock data (position and scale factor)
         val clockData = loadClockPosition()
