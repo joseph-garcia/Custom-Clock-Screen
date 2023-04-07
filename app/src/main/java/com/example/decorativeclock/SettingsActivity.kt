@@ -64,10 +64,10 @@ class SettingsActivity : AppCompatActivity() {
         val toggleMilitaryTimeSwitch: Switch = findViewById(R.id.toggleMilitaryTimeSwitch)
 
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
-        val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
+        //val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
+        val isMilitaryTime = sharedPreferences.getBoolean("is_24_hour_format", false)
         toggleMilitaryTimeSwitch.isChecked = isMilitaryTime
         var newIsMilitaryTime = isMilitaryTime
-
 
 
         toggleMilitaryTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -85,8 +85,6 @@ class SettingsActivity : AppCompatActivity() {
 
         // Initialize colorPickerView
         colorPickerView = findViewById(R.id.color_picker_view)
-
-
 
 
         // Retrieve the current clock text color from shared preferences
@@ -254,9 +252,7 @@ class SettingsActivity : AppCompatActivity() {
                 editor.apply()
             }
 
-            // call setFormatting from ResizableClockTextView class
-            ResizableClockTextView.setFormatting()
-
+            Log.d("josephDebug", "is_24_hour_format: $is24HourFormat")
 
             finish()
         }

@@ -336,6 +336,7 @@ class MainActivity : AppCompatActivity() {
     // Add this method to save the background image URI
     override fun onResume() {
         super.onResume()
+        Log.d("josephDebug", "onResume running")
         val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
         if (backgroundImageUriString != null) {
             val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
@@ -426,6 +427,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         clockTextView.setTextColor(textColor)
+
+        // get is_24_hour_format from SharedPreferences
+        val is24HourFormat = sharedPreferences.getBoolean("is_24_hour_format", false)
+
+        // set the ClockText based on the value of is_24_hour_format with clockTextView.setFormat12Hour() or clockTextView.setFormat24Hour()
+        if (is24HourFormat) {
+            clockTextView.format12Hour = null
+            clockTextView.format24Hour = "HH:mm"
+        } else {
+            clockTextView.format24Hour = null
+            clockTextView.format12Hour = "hh:mm a"
+        }
+
+
     }
 
 

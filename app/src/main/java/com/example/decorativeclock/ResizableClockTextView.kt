@@ -33,25 +33,8 @@ class ResizableClockTextView @JvmOverloads constructor(
     init {
         scaleDetector = ScaleGestureDetector(context, ScaleListener())
         gestureDetector = GestureDetector(context, DoubleTapListener())
-        var initialTextSize = textSize
-        setFormatting()
 
     }
-
-    fun setFormatting() {
-        val sharedPreferences = context.getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
-        val is24HourFormat = sharedPreferences.getBoolean("is_24_hour_format", false)
-        Log.d("josephDebug", "getting called here?.. is24HourFormat: $is24HourFormat")
-        if (is24HourFormat) {
-            format12Hour = null
-            format24Hour = "H:mm"
-        } else {
-            format24Hour = null
-            format12Hour = "h:mm a"
-        }
-    }
-
-
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         gestureDetector.onTouchEvent(event)
@@ -113,10 +96,6 @@ class ResizableClockTextView @JvmOverloads constructor(
             return true
         }
     }
-
-
-
-
 }
 
 
