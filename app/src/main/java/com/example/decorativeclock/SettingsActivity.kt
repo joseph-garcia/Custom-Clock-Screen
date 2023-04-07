@@ -339,6 +339,9 @@ class SettingsActivity : AppCompatActivity() {
         val sdf = SimpleDateFormat(formatString, Locale.getDefault())
         val currentTime = Calendar.getInstance().time
 
+        // Log sdf.format(currentTime) to Logcat
+        Log.d("josephDebug", sdf.format(currentTime))
+
         previewTextView.text = sdf.format(currentTime)
     }
 

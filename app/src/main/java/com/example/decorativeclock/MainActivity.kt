@@ -43,13 +43,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var clockTextView: ResizableClockTextView
     private var timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
-
-//    private val updateTimeRunnable = object : Runnable {
-//        override fun run() {
-//            clockTextView.postDelayed(this, 1000)
-//        }
-//    }
-
     private var isRotating = false
 
     // Initialize optionsIcon and fadeHandler for fading in/out the options icon
@@ -84,10 +77,6 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         })
-
-
-
-
 
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
         val isMilitaryTime = sharedPreferences.getBoolean("military_time", false)
@@ -447,7 +436,7 @@ class MainActivity : AppCompatActivity() {
             clockTextView.format24Hour = "HH" + colonFormatString + "mm"
         } else {
             clockTextView.format24Hour = null
-            clockTextView.format12Hour = "hh" + colonFormatString + "a"
+            clockTextView.format12Hour = "hh" + colonFormatString + "mm a"
         }
 
 

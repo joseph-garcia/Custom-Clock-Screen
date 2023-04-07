@@ -38,6 +38,12 @@ class ResizableClockTextView @JvmOverloads constructor(
 
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val widthSpec = MeasureSpec.makeMeasureSpec(Int.MAX_VALUE shr 2, MeasureSpec.AT_MOST)
+        val heightSpec = MeasureSpec.makeMeasureSpec(Int.MAX_VALUE shr 2, MeasureSpec.AT_MOST)
+        super.onMeasure(widthSpec, heightSpec)
+    }
+
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         private var scaleFactor = 1f
 
@@ -121,6 +127,8 @@ class ResizableClockTextView @JvmOverloads constructor(
             return true
         }
     }
+
+
 }
 
 

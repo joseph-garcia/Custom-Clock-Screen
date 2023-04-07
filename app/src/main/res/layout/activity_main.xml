@@ -23,7 +23,7 @@
             android:id="@+id/clockTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00"
+            android:text="00:00 PM"
             android:layout_gravity="center"
             android:gravity="center"
             android:textSize="50sp"
@@ -37,7 +37,9 @@
             android:shadowRadius="6"
             android:lineSpacingExtra="0sp"
             android:backgroundTint="@color/black"
-            android:lineSpacingMultiplier="1" />
+            android:lineSpacingMultiplier="1"
+            android:maxWidth="10000dp" />
+
     </FrameLayout>
 
 
