@@ -47,19 +47,26 @@ class ResizableClockTextView @JvmOverloads constructor(
         }
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
-            scaleFactor *= detector.scaleFactor
-            scaleFactor = scaleFactor.coerceAtLeast(0.1f).coerceAtMost(5.0f)
+            val tempScaleFactor = scaleFactor * detector.scaleFactor
+            scaleFactor = tempScaleFactor.coerceAtLeast(0.1f).coerceAtMost(5.0f)
 
-            val newSize = originalTextSize * scaleFactor
-            textSize = newSize.coerceAtLeast(10f).coerceAtMost(500f)
+            // Apply a low-pass filter to the scaleFactor
+            val smoothFactor = 0.2f
+            val smoothScaleFactor = (scaleFactor * smoothFactor) + (this@ResizableClockTextView.scaleX * (1 - smoothFactor))
+
+            scaleX = smoothScaleFactor
+            scaleY = smoothScaleFactor
+
             return true
         }
+
 
         override fun onScaleEnd(detector: ScaleGestureDetector) {
             isScalingInProgress = false
             resetLastTouchPosition = true
         }
     }
+
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         gestureDetector.onTouchEvent(event)
