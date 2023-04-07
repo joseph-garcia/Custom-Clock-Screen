@@ -16,6 +16,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.widget.NestedScrollView
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -102,7 +103,7 @@ class SettingsActivity : AppCompatActivity() {
         colorPickerView.setInitialColor(currentClockTextColor)
 
         val colorPickerView = findViewById<ColorPickerView>(R.id.color_picker_view)
-        val scrollView = findViewById<ScrollView>(R.id.scrollView)
+        val scrollView = findViewById<NestedScrollView>(R.id.scrollView)
         // Disable scrolling on the color picker view when the user is interacting with it
         colorPickerView.setOnTouchListener { _, event ->
             when (event.action) {
