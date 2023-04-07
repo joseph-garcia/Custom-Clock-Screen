@@ -273,6 +273,9 @@ class MainActivity : AppCompatActivity() {
         // Reset the clock rotation
         clockTextView.rotation = 0f
 
+        // Reset clock text size
+        clockTextView.textSize = 50f
+
         saveClockPosition(clockTextView.x, clockTextView.y)
     }
     private fun saveClockPosition(x: Float, y: Float) {
