@@ -422,7 +422,7 @@ class MainActivity : AppCompatActivity() {
         val textColor = sharedPreferences.getInt("clock_text_color", ContextCompat.getColor(this, R.color.icon_color))
         Log.d("josephDebug", "default color: ${ContextCompat.getColor(this, R.color.icon_color)}")
 
-        if (selectedFont == "pressstart2p_regular") {
+        if (selectedFont == "pressstart_regular") {
             val customTypeface = ResourcesCompat.getFont(this, R.font.pressstart_regular)
             clockTextView.typeface = customTypeface
         } else {
@@ -431,17 +431,25 @@ class MainActivity : AppCompatActivity() {
 
         clockTextView.setTextColor(textColor)
 
+        // get isColonEnabled from SharedPreferences
+        val isColonEnabled = sharedPreferences.getBoolean("is_colon_enabled", true)
+        val colonFormatString = if (isColonEnabled) {
+            ":"
+        } else {
+            " "
+        }
+
         // get is_24_hour_format from SharedPreferences
         val is24HourFormat = sharedPreferences.getBoolean("is_24_hour_format", false)
-
         // set the ClockText based on the value of is_24_hour_format with clockTextView.setFormat12Hour() or clockTextView.setFormat24Hour()
         if (is24HourFormat) {
             clockTextView.format12Hour = null
-            clockTextView.format24Hour = "HH:mm"
+            clockTextView.format24Hour = "HH" + colonFormatString + "mm"
         } else {
             clockTextView.format24Hour = null
-            clockTextView.format12Hour = "hh:mm a"
+            clockTextView.format12Hour = "hh" + colonFormatString + "a"
         }
+
 
 
     }

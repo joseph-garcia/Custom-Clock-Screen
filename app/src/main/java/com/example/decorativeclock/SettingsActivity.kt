@@ -9,7 +9,6 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -25,8 +24,8 @@ import com.skydoves.colorpickerview.sliders.BrightnessSlideBar
 import com.yalantis.ucrop.UCrop
 import java.io.File
 import java.io.FileOutputStream
-
-
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -38,13 +37,17 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var colorPickerView: ColorPickerView
 
+    private lateinit var toggleMilitaryTimeSwitch: Switch
+    private lateinit var toggleColonSwitch: Switch
+
+
     private val fontMap = mapOf(
         "Default" to "sans-serif",
         "Serif" to "serif",
         "Monospace" to "monospace",
         "Cursive" to "cursive",
         "Fantasy" to "fantasy",
-        "Press Start" to "pressstart2p_regular"
+        "Press Start" to "pressstart_regular"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,26 +64,28 @@ class SettingsActivity : AppCompatActivity() {
             openImagePicker()
         }
 
-        val toggleMilitaryTimeSwitch: Switch = findViewById(R.id.toggleMilitaryTimeSwitch)
+        toggleMilitaryTimeSwitch = findViewById(R.id.toggleMilitaryTimeSwitch)
+        toggleColonSwitch = findViewById(R.id.toggleColonSwitch)
 
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
-        //val isMilitaryTime = sharedPreferences.getBoolean("is_military_time", false)
+
+        val isColonEnabled = sharedPreferences.getBoolean("is_colon_enabled", true)
         val isMilitaryTime = sharedPreferences.getBoolean("is_24_hour_format", false)
         toggleMilitaryTimeSwitch.isChecked = isMilitaryTime
-        var newIsMilitaryTime = isMilitaryTime
+        toggleColonSwitch.isChecked = isColonEnabled
 
+        toggleMilitaryTimeSwitch.setOnCheckedChangeListener { _, _ ->
+            updatePreviewText()
+        }
 
-        toggleMilitaryTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            newIsMilitaryTime = isChecked
-            // if military time is enabled, add to previewTextView, if not, remove from previewTextView
-            if (isChecked) {
-                previewTextView.text = "13:34"
-            } else {
-                previewTextView.text = "01:34 PM"
-            }
+        toggleColonSwitch.setOnCheckedChangeListener { _, _ ->
+            updatePreviewText()
         }
 
         previewTextView = findViewById(R.id.preview_text_view)
+
+        // Call updatePreviewText to initialize the previewTextView with the correct format
+        updatePreviewText()
         val saveFontButton: Button = findViewById(R.id.save_font_button)
 
         // Initialize colorPickerView
@@ -242,6 +247,7 @@ class SettingsActivity : AppCompatActivity() {
             val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
             val selectedColor = colorPickerView.colorEnvelope.color
             val is24HourFormat = toggleMilitaryTimeSwitch.isChecked
+            val isColonEnabled = toggleColonSwitch.isChecked
 
             if (selectedFont != null) {
                 editor.putString("clock_font", selectedFont)
@@ -249,10 +255,9 @@ class SettingsActivity : AppCompatActivity() {
                 // Save the state of the switches
                 editor.putBoolean("is_drop_shadow_enabled", newIsDropShadowEnabled)
                 editor.putBoolean("is_24_hour_format", is24HourFormat)
+                editor.putBoolean("is_colon_enabled", isColonEnabled)
                 editor.apply()
             }
-
-            Log.d("josephDebug", "is_24_hour_format: $is24HourFormat")
 
             finish()
         }
@@ -320,4 +325,21 @@ class SettingsActivity : AppCompatActivity() {
     private fun removeDropShadow(textView: TextView) {
         textView.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT)
     }
+
+    fun updatePreviewText() {
+        val isMilitaryTime = toggleMilitaryTimeSwitch.isChecked
+        val isColonEnabled = toggleColonSwitch.isChecked
+
+        val hourFormat = if (isMilitaryTime) "HH" else "h"
+        val separator = if (isColonEnabled) ":" else " "
+        val minuteFormat = "mm"
+        val amPmFormat = if (isMilitaryTime) "" else " a"
+
+        val formatString = "$hourFormat$separator$minuteFormat$amPmFormat"
+        val sdf = SimpleDateFormat(formatString, Locale.getDefault())
+        val currentTime = Calendar.getInstance().time
+
+        previewTextView.text = sdf.format(currentTime)
+    }
+
 }
