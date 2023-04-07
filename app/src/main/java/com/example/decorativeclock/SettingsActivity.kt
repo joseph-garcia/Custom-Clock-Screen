@@ -17,6 +17,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -41,6 +45,9 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var toggleMilitaryTimeSwitch: Switch
     private lateinit var toggleColonSwitch: Switch
 
+    companion object {
+        const val IMAGE_PICK_REQUEST_CODE = 1001
+    }
 
     private val fontMap = mapOf(
         "Default" to "sans-serif",
@@ -263,15 +270,36 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
+        // set background image
+        val backgroundImageUriString = sharedPreferences.getString(MainActivity.BACKGROUND_IMAGE_URI_KEY, null)
+        if (backgroundImageUriString != null) {
+            val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
+            setBackgroundImage(backgroundImageUri)
+        }
+
+    }
+
+    private fun setBackgroundImage(resultUri: Uri) {
+        val backgroundImageView = findViewById<ImageView>(R.id.background_preview)
+
+        val requestOptions = RequestOptions()
+            .centerCrop()
+            .error(com.bumptech.glide.R.drawable.abc_control_background_material) // Replace with your own error image
+
+        Glide.with(this)
+            .load(resultUri)
+            .apply(requestOptions)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .into(backgroundImageView)
     }
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, IMAGE_PICK_REQUEST_CODE)
     }
-    companion object {
-        const val IMAGE_PICK_REQUEST_CODE = 1001
-    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -280,6 +308,7 @@ class SettingsActivity : AppCompatActivity() {
             if (selectedImageUri != null) {
                 if (isGifFile(this, selectedImageUri)) {
                     saveCroppedImageUri(selectedImageUri)
+                    setBackgroundImage(selectedImageUri)
                 } else {
                     val display = windowManager.defaultDisplay
                     val size = Point()
@@ -292,12 +321,16 @@ class SettingsActivity : AppCompatActivity() {
                     uCrop.start(this)
                 }
             }
+
         } else if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data!!)
             if (resultUri != null) {
                 saveCroppedImageUri(resultUri)
+                setBackgroundImage(resultUri)
             }
+
         }
+
     }
     private fun saveCroppedImageUri(uri: Uri) {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)

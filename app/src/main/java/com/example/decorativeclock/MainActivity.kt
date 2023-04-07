@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_IMAGE_PICK = 1000
-        private const val BACKGROUND_IMAGE_URI_KEY = "background_image_uri"
+        const val BACKGROUND_IMAGE_URI_KEY = "background_image_uri"
     }
 
     private lateinit var sharedPreferences: SharedPreferences
