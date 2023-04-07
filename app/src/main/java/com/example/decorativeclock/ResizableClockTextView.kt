@@ -9,6 +9,8 @@ import android.view.ScaleGestureDetector
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.TextClock
+import android.animation.ObjectAnimator
+
 
 
 
@@ -20,18 +22,39 @@ class ResizableClockTextView @JvmOverloads constructor(
 ) : TextClock(context, attrs, defStyleAttr) {
 
     private val scaleDetector: ScaleGestureDetector
+    private val gestureDetector: GestureDetector
     private val originalTextSize = 50f;
+
 
     private var lastTouchX = 0f
     private var lastTouchY = 0f
+    private var rotationAngle = 0f
 
     init {
         scaleDetector = ScaleGestureDetector(context, ScaleListener())
+        gestureDetector = GestureDetector(context, DoubleTapListener())
         var initialTextSize = textSize
+        setFormatting()
 
     }
 
+    fun setFormatting() {
+        val sharedPreferences = context.getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
+        val is24HourFormat = sharedPreferences.getBoolean("is_24_hour_format", false)
+        Log.d("josephDebug", "getting called here?.. is24HourFormat: $is24HourFormat")
+        if (is24HourFormat) {
+            format12Hour = null
+            format24Hour = "H:mm"
+        } else {
+            format24Hour = null
+            format12Hour = "h:mm a"
+        }
+    }
+
+
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(event)
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 lastTouchX = event.rawX
@@ -72,7 +95,31 @@ class ResizableClockTextView @JvmOverloads constructor(
             return true
         }
     }
+
+    private inner class DoubleTapListener : GestureDetector.SimpleOnGestureListener() {
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            val nextRotationAngle = rotationAngle + 90f
+
+            val rotateAnimator = ObjectAnimator.ofFloat(
+                this@ResizableClockTextView,
+                "rotation",
+                rotationAngle,
+                nextRotationAngle
+            )
+            rotateAnimator.duration = 300 // Duration of the animation in milliseconds
+            rotateAnimator.start()
+
+            rotationAngle = nextRotationAngle % 360
+            return true
+        }
+    }
+
+
+
+
 }
+
+
 
 
 

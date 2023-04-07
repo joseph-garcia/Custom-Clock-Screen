@@ -80,8 +80,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        // my package name is com.example.decorativeclock
-
         previewTextView = findViewById(R.id.preview_text_view)
         val saveFontButton: Button = findViewById(R.id.save_font_button)
 
@@ -245,15 +243,21 @@ class SettingsActivity : AppCompatActivity() {
             val editor = sharedPreferences.edit()
             val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
             val selectedColor = colorPickerView.colorEnvelope.color
+            val is24HourFormat = toggleMilitaryTimeSwitch.isChecked
 
             if (selectedFont != null) {
                 editor.putString("clock_font", selectedFont)
                 editor.putInt("clock_text_color", selectedColor)
                 // Save the state of the switches
-                //editor.putBoolean("is_military_time", newIsMilitaryTime)
                 editor.putBoolean("is_drop_shadow_enabled", newIsDropShadowEnabled)
+                editor.putBoolean("is_24_hour_format", is24HourFormat)
                 editor.apply()
             }
+
+            // call setFormatting from ResizableClockTextView class
+            ResizableClockTextView.setFormatting()
+
+
             finish()
         }
 

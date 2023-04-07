@@ -40,14 +40,15 @@ import androidx.lifecycle.Observer
 class MainActivity : AppCompatActivity() {
 
     // Initialize clockTextView
-    private lateinit var clockTextView: TextView
+    private lateinit var clockTextView: ResizableClockTextView
     private var timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
-    private val updateTimeRunnable = object : Runnable {
-        override fun run() {
-            clockTextView.postDelayed(this, 1000)
-        }
-    }
+
+//    private val updateTimeRunnable = object : Runnable {
+//        override fun run() {
+//            clockTextView.postDelayed(this, 1000)
+//        }
+//    }
 
     private var isRotating = false
 
@@ -76,13 +77,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // initialize gesture detector to override later
-//        val doubleTapGestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-//            override fun onDoubleTap(e: MotionEvent): Boolean {
-//                Log.d("josephDebug", "DOUBLE TAPPING")
-//                rotateClockTextView()
-//                return true
-//            }
-//        })
+        val doubleTapGestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                Log.d("josephDebug", "DOUBLE TAPPING")
+                rotateClockTextView()
+                return true
+            }
+        })
 
 
 
@@ -167,6 +168,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupFadeInFadeOutBehavior() {
+        Log.d("josephDebug", "setting fade behavior")
         // Set up the fade in/out behavior
         val fadeOutRunnable = Runnable { fadeOutViews() }
 
@@ -244,19 +246,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     // this method is called when the app is paused and it saves the clock position and scale factor
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-
-        if (hasFocus) {
-            val minX = 0f
-            val minY = 0f
-            val maxX = resources.displayMetrics.widthPixels - clockTextView.width.toFloat()
-            val maxY = resources.displayMetrics.heightPixels - clockTextView.height.toFloat()
-
-            clockTextView.x = clockTextView.x.coerceIn(minX, maxX)
-            clockTextView.y = clockTextView.y.coerceIn(minY, maxY)
-        }
-    }
+//    override fun onWindowFocusChanged(hasFocus: Boolean) {
+//        super.onWindowFocusChanged(hasFocus)
+//
+//        if (hasFocus) {
+//            val minX = 0f
+//            val minY = 0f
+//            val maxX = resources.displayMetrics.widthPixels - clockTextView.width.toFloat()
+//            val maxY = resources.displayMetrics.heightPixels - clockTextView.height.toFloat()
+//
+//            clockTextView.x = clockTextView.x.coerceIn(minX, maxX)
+//            clockTextView.y = clockTextView.y.coerceIn(minY, maxY)
+//        }
+//    }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putFloat("x", clockTextView.x)
@@ -346,12 +348,12 @@ class MainActivity : AppCompatActivity() {
 
         updateDropShadow()
         loadClockSettings()
-        clockTextView.post(updateTimeRunnable)
+        //clockTextView.post(updateTimeRunnable)
     }
 
     override fun onPause() {
         super.onPause()
-        clockTextView.removeCallbacks(updateTimeRunnable)
+        //clockTextView.removeCallbacks(updateTimeRunnable)
     }
     private fun setBackgroundImage(resultUri: Uri) {
         val backgroundImageView = findViewById<ImageView>(R.id.background_image)
