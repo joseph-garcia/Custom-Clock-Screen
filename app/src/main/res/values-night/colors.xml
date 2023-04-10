@@ -2,4 +2,5 @@
 <resources>
     <color name="clockTextColor">#FFFFFF</color>
     <color name="icon_color">#FFFFFF</color>
+    <color name="whiteOrBlack">#FFFFFF</color>
 </resources>

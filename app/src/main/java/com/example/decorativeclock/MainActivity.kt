@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
 
     // Initialize optionsIcon and fadeHandler for fading in/out the options icon
     private lateinit var optionsIcon: ImageView
+    private lateinit var helpIcon: ImageView
     private val fadeHandler = Handler(Looper.getMainLooper())
     private var statusBarHeight = 0
     private val fadeOutHandler = Handler(Looper.getMainLooper())
@@ -69,6 +70,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Keep the screen on while this activity is running
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         // initialize gesture detector to override later
         val doubleTapGestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDoubleTap(e: MotionEvent): Boolean {
@@ -81,9 +85,11 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
         val isMilitaryTime = sharedPreferences.getBoolean("military_time", false)
 
-        // Initialize optionsIcon
+        // Initialize optionsIcon and helpIcon
         optionsIcon = findViewById(R.id.optionsIcon)
         optionsIcon.y = statusBarHeight.toFloat()
+        helpIcon = findViewById(R.id.helpIcon)
+        helpIcon.y = statusBarHeight.toFloat()
 
         // Get the status bar height for use in the fade in/out behavior
         statusBarHeight = getStatusBarHeight()
@@ -200,6 +206,7 @@ class MainActivity : AppCompatActivity() {
     // Add these helper methods to fade in and fade out the views
     private fun fadeOutViews() {
         optionsIcon.animate().alpha(0f).duration = 300
+        helpIcon.animate().alpha(0f).duration = 300
 
         // Use the new notification bar handler to schedule a new action
         notificationBarHandler.postDelayed({
@@ -216,6 +223,15 @@ class MainActivity : AppCompatActivity() {
                 // Reset the options icon's position
                 optionsIcon.y = statusBarHeight.toFloat()
 
+            }
+            .start()
+
+        helpIcon.animate()
+            .alpha(1f)
+            .setDuration(300)
+            .withEndAction {
+                // Reset the help icon's position
+                helpIcon.y = statusBarHeight.toFloat()
             }
             .start()
     }
