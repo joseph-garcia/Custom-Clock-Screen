@@ -1,164 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     tools:context=".SettingsActivity">
 
-    <LinearLayout
-        android:id="@+id/settings_layout"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardView"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/background_preview"
-                    android:layout_width="match_parent"
-                    android:layout_height="125dp" />
-
-                <TextView
-                    android:id="@+id/preview_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="12:34 AM"
-                    android:textSize="30sp" />
-
-            </FrameLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-
-        <TextView
-            android:id="@+id/background_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:text="Background"
-            android:textSize="18sp"
-            android:textColor="@color/whiteOrBlack"/>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/changeBackgroundButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Select Image"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            app:cornerRadius="8dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/whiteOrBlack"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_marginBottom="1dp"
-            android:text="Font"
-            android:textSize="18sp"
-            android:textColor="@color/whiteOrBlack"/>
-
-        <Spinner
-            android:id="@+id/font_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp" />
-
-        <Switch
-            android:id="@+id/toggleMilitaryTimeSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Toggle Military Time" />
-
-        <Switch
-            android:id="@+id/toggleDropShadowSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Drop Shadow"
-            android:checked="true" />
-
-        <Switch
-            android:id="@+id/toggleColonSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Show Colon"
-            android:checked="true"
-            android:layout_marginBottom="8dp"/>
-
-
-
-        <com.skydoves.colorpickerview.ColorPickerView
-            android:id="@+id/color_picker_view"
-            android:layout_width="260dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_height="260dp"
-            android:layout_marginBottom="30dp"/>
-
-        <com.skydoves.colorpickerview.sliders.AlphaSlideBar
-            android:id="@+id/alphaSlideBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:selector_AlphaSlideBar="@drawable/wheel"
-            app:borderColor_AlphaSlideBar="@android:color/darker_gray"
-            app:borderSize_AlphaSlideBar="5"
-            android:layout_marginBottom="3dp"/>
-
-        <com.skydoves.colorpickerview.sliders.BrightnessSlideBar
-            android:id="@+id/brightnessSlideBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:selector_BrightnessSlider="@drawable/wheel"
-            app:borderColor_BrightnessSlider="@android:color/darker_gray"
-            app:borderSize_BrightnessSlider="5"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="3dp"
-            android:text="Clock Preview"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/save_font_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save"/>
-
-
-
-
-        <TextView
-            android:id="@+id/guide_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"
-            android:text="@string/guide_text"
-            android:gravity="center"
-            android:textSize="15sp"
-            android:paddingTop="40dp"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Settings"
+            app:titleTextColor="@color/whiteOrBlackInverted"
+            app:titleCentered="true"
+            app:navigationIcon="@drawable/setting_icon"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            style="@style/Widget.MaterialComponents.Toolbar.Primary"
             />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <LinearLayout
+            android:id="@+id/settings_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="Preview"
+                android:textSize="18sp"
+                android:textColor="@color/whiteOrBlack"/>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/background_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="125dp" />
+                    <TextView
+                        android:id="@+id/preview_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="12:34 AM"
+                        android:textSize="30sp" />
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/background_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="Background"
+                android:textSize="18sp"
+                android:textColor="@color/whiteOrBlack"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/changeBackgroundButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select Image"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:cornerRadius="8dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/whiteOrBlack"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginBottom="1dp"
+                android:text="Font"
+                android:textSize="18sp"
+                android:textColor="@color/whiteOrBlack"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/font_dropdown_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                app:boxStrokeWidth="1dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxStrokeColor="@color/whiteOrBlack"
+                app:boxStrokeWidthFocused="1dp"
+
+
+                >
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/font_autocomplete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:inputType="none"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
 
 
 
-    </LinearLayout>
+            <Switch
+                android:id="@+id/toggleMilitaryTimeSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Toggle Military Time" />
 
-</androidx.core.widget.NestedScrollView>
+            <Switch
+                android:id="@+id/toggleDropShadowSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Drop Shadow"
+                android:checked="true" />
+
+            <Switch
+                android:id="@+id/toggleColonSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Colon"
+                android:checked="true"
+                android:layout_marginBottom="8dp"/>
+
+            <com.skydoves.colorpickerview.ColorPickerView
+                android:id="@+id/color_picker_view"
+                android:layout_width="260dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="260dp"
+                android:layout_marginBottom="30dp"/>
+            <com.skydoves.colorpickerview.sliders.AlphaSlideBar
+                android:id="@+id/alphaSlideBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:selector_AlphaSlideBar="@drawable/wheel"
+                app:borderColor_AlphaSlideBar="@android:color/darker_gray"
+                app:borderSize_AlphaSlideBar="5"
+                android:layout_marginBottom="3dp"/>
+            <com.skydoves.colorpickerview.sliders.BrightnessSlideBar
+                android:id="@+id/brightnessSlideBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:selector_BrightnessSlider="@drawable/wheel"
+                app:borderColor_BrightnessSlider="@android:color/darker_gray"
+                app:borderSize_BrightnessSlider="5"/>
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/save_font_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/whiteOrBlack"
+                android:textColor="@color/whiteOrBlackInverted"
+                android:text="Save"/>
+            <TextView
+                android:id="@+id/guide_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:text="@string/guide_text"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:paddingTop="40dp"
+                />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

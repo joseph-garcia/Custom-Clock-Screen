@@ -3,4 +3,10 @@
     <color name="clockTextColor">#FFFFFF</color>
     <color name="icon_color">#FFFFFF</color>
     <color name="whiteOrBlack">#FFFFFF</color>
+    <color name="whiteOrBlackInverted">#000000</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryVariant">#FF3700B3</color>
+    <color name="colorOnPrimary">#FFFFFFFF</color>
+
+    <color name="box_background">#FF0000CC</color>
 </resources>

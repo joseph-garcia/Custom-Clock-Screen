@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.textfield.TextInputLayout
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -35,7 +36,7 @@ import java.util.*
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var fontSpinner: Spinner
+    private lateinit var autoCompleteTextView: AutoCompleteTextView
     private lateinit var previewTextView: TextView
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -165,41 +166,70 @@ class SettingsActivity : AppCompatActivity() {
         }
 
 
-        // Initialize fontSpinner
-        fontSpinner = findViewById(R.id.font_spinner)
-        val fontAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fontMap.keys.toList())
-        fontAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        fontSpinner.adapter = fontAdapter
+//        // Initialize fontSpinner
+//        fontSpinner = findViewById(R.id.font_spinner)
+//        //val fontAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fontMap.keys.toList())
+//        fontAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//        fontSpinner.adapter = fontAdapter
+//
+//        // Set the spinner's selected item to the current font
+//        if (currentFontPosition != -1) {
+//            fontSpinner.setSelection(currentFontPosition)
+//        }
+//
+//        fontSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//                val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
+//                val defaultFonts = listOf("sans-serif", "serif", "monospace", "cursive", "fantasy")
+//                if (selectedFont != null) {
+//                    if (defaultFonts.contains(selectedFont)) {
+//                        previewTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
+//                    } else {
+//                        val fontResourceId = resources.getIdentifier(selectedFont, "font", packageName)
+//                        val customTypeface = ResourcesCompat.getFont(this@SettingsActivity, fontResourceId)
+//                        previewTextView.typeface = customTypeface
+//                    }
+//                }
+//            }
+//
+//            override fun onNothingSelected(parent: AdapterView<*>?) {
+//            }
+//        }
+
+        // Initialize fontDropdownMenu and fontAutocomplete
+        val fontDropdownMenu = findViewById<TextInputLayout>(R.id.font_dropdown_menu)
+        val fontAutocomplete = findViewById<AutoCompleteTextView>(R.id.font_autocomplete)
+        val fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList())
+        fontAutocomplete.setAdapter(fontAdapter)
 
         // Retrieve the current clock font from shared preferences
         val currentClockFont = sharedPreferences.getString("clock_font", "sans-serif")
 
-        // Find the position of the current font in the spinner
+        // Find the position of the current font in the adapter
         val currentFontPosition = fontMap.entries.indexOfFirst { it.value == currentClockFont }
 
-        // Set the spinner's selected item to the current font
+        // Set the selected item in the AutoCompleteTextView to the current font
         if (currentFontPosition != -1) {
-            fontSpinner.setSelection(currentFontPosition)
+            fontAutocomplete.setText(fontAdapter.getItem(currentFontPosition), false)
+            updatePreviewFont(fontMap[fontAdapter.getItem(currentFontPosition)])
         }
 
-        fontSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
-                val defaultFonts = listOf("sans-serif", "serif", "monospace", "cursive", "fantasy")
-                if (selectedFont != null) {
-                    if (defaultFonts.contains(selectedFont)) {
-                        previewTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
-                    } else {
-                        val fontResourceId = resources.getIdentifier(selectedFont, "font", packageName)
-                        val customTypeface = ResourcesCompat.getFont(this@SettingsActivity, fontResourceId)
-                        previewTextView.typeface = customTypeface
-                    }
+        // Set an ItemClickListener for fontAutocomplete
+        fontAutocomplete.setOnItemClickListener { parent, view, position, id ->
+            val selectedFont = fontMap[parent.getItemAtPosition(position).toString()]
+            updatePreviewFont(selectedFont)
+            val defaultFonts = listOf("sans-serif", "serif", "monospace", "cursive", "fantasy")
+            if (selectedFont != null) {
+                if (defaultFonts.contains(selectedFont)) {
+                    previewTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
+                } else {
+                    val fontResourceId = resources.getIdentifier(selectedFont, "font", packageName)
+                    val customTypeface = ResourcesCompat.getFont(this@SettingsActivity, fontResourceId)
+                    previewTextView.typeface = customTypeface
                 }
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
         }
+
 
         colorPickerView.setColorListener(object : ColorEnvelopeListener {
             override fun onColorSelected(envelope: ColorEnvelope, fromUser: Boolean) {
@@ -252,7 +282,7 @@ class SettingsActivity : AppCompatActivity() {
         saveFontButton.setOnClickListener {
             val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
-            val selectedFont = fontMap[fontSpinner.selectedItem.toString()]
+            val selectedFont = fontMap[fontAutocomplete.text.toString()]
             val selectedColor = colorPickerView.colorEnvelope.color
             val is24HourFormat = toggleMilitaryTimeSwitch.isChecked
             val isColonEnabled = toggleColonSwitch.isChecked
@@ -278,6 +308,20 @@ class SettingsActivity : AppCompatActivity() {
         }
 
     }
+
+    private fun updatePreviewFont(selectedFont: String?) {
+        val defaultFonts = listOf("sans-serif", "serif", "monospace", "cursive", "fantasy")
+        if (selectedFont != null) {
+            if (defaultFonts.contains(selectedFont)) {
+                previewTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
+            } else {
+                val fontResourceId = resources.getIdentifier(selectedFont, "font", packageName)
+                val customTypeface = ResourcesCompat.getFont(this@SettingsActivity, fontResourceId)
+                previewTextView.typeface = customTypeface
+            }
+        }
+    }
+
 
     private fun setBackgroundImage(resultUri: Uri) {
         val backgroundImageView = findViewById<ImageView>(R.id.background_preview)
