@@ -27,6 +27,7 @@ import android.os.*
 import android.util.Log
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -322,17 +323,64 @@ class MainActivity : AppCompatActivity() {
         }
 
         val clockFont = sharedPreferences.getString("clock_font", "sans-serif")
-        val clockTextView = findViewById<TextView>(R.id.clockTextView)
+        val clockTextView: ResizableClockTextView = findViewById(R.id.clockTextView)
         clockTextView.typeface = Typeface.create(clockFont, Typeface.NORMAL)
 
         updateDropShadow()
         loadClockSettings()
-        //clockTextView.post(updateTimeRunnable)
+
+
+        clockTextView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val hasPositionSaved = sharedPreferences.contains("clock_left_margin") && sharedPreferences.contains("clock_top_margin")
+
+                val leftMargin = if (hasPositionSaved) {
+                    sharedPreferences.getInt("clock_left_margin", 0)
+                } else {
+                    (resources.displayMetrics.widthPixels / 2) - (clockTextView.measuredWidth / 2)
+                }
+
+                val topMargin = if (hasPositionSaved) {
+                    sharedPreferences.getInt("clock_top_margin", 0)
+                } else {
+                    (resources.displayMetrics.heightPixels / 2) - (clockTextView.measuredHeight / 2)
+                }
+
+                val scaleX = sharedPreferences.getFloat("clock_scale_x", 1f)
+                val scaleY = sharedPreferences.getFloat("clock_scale_y", 1f)
+                val rotation = sharedPreferences.getFloat("clock_rotation", 0f)
+
+                val layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+                layoutParams.leftMargin = leftMargin
+                layoutParams.topMargin = topMargin
+
+                clockTextView.layoutParams = layoutParams
+                clockTextView.scaleX = scaleX
+                clockTextView.scaleY = scaleY
+                clockTextView.rotation = rotation
+
+                // Remove the listener to avoid multiple callbacks
+                clockTextView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
     }
 
     override fun onPause() {
         super.onPause()
-        //clockTextView.removeCallbacks(updateTimeRunnable)
+        val clockTextView: ResizableClockTextView = findViewById(R.id.clockTextView)
+
+        val layoutParams = clockTextView.layoutParams as FrameLayout.LayoutParams
+        sharedPreferences.edit {
+            putInt("clock_left_margin", layoutParams.leftMargin)
+            putInt("clock_top_margin", layoutParams.topMargin)
+            putFloat("clock_scale_x", clockTextView.scaleX)
+            putFloat("clock_scale_y", clockTextView.scaleY)
+            putFloat("clock_rotation", clockTextView.rotation)
+        }
     }
     private fun setBackgroundImage(resultUri: Uri) {
         val backgroundImageView = findViewById<ImageView>(R.id.background_image)

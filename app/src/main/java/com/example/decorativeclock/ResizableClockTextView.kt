@@ -11,10 +11,6 @@ import android.widget.RelativeLayout
 import android.widget.TextClock
 import android.animation.ObjectAnimator
 
-
-
-
-
 class ResizableClockTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -26,54 +22,39 @@ class ResizableClockTextView @JvmOverloads constructor(
     private val originalTextSize = 50f;
     private var isScalingInProgress = false
     private var resetLastTouchPosition = false
-
-
     private var lastTouchX = 0f
     private var lastTouchY = 0f
     private var rotationAngle = 0f
-
     init {
         scaleDetector = ScaleGestureDetector(context, ScaleListener())
         gestureDetector = GestureDetector(context, DoubleTapListener())
-
     }
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthSpec = MeasureSpec.makeMeasureSpec(Int.MAX_VALUE shr 2, MeasureSpec.AT_MOST)
         val heightSpec = MeasureSpec.makeMeasureSpec(Int.MAX_VALUE shr 2, MeasureSpec.AT_MOST)
         super.onMeasure(widthSpec, heightSpec)
     }
-
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         private var scaleFactor = 1f
-
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
             isScalingInProgress = true
             return super.onScaleBegin(detector)
         }
-
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             val tempScaleFactor = scaleFactor * detector.scaleFactor
             scaleFactor = tempScaleFactor.coerceAtLeast(0.1f).coerceAtMost(5.0f)
-
             // Apply a low-pass filter to the scaleFactor
             val smoothFactor = 0.2f
             val smoothScaleFactor = (scaleFactor * smoothFactor) + (this@ResizableClockTextView.scaleX * (1 - smoothFactor))
-
             scaleX = smoothScaleFactor
             scaleY = smoothScaleFactor
-
             return true
         }
-
-
         override fun onScaleEnd(detector: ScaleGestureDetector) {
             isScalingInProgress = false
             resetLastTouchPosition = true
         }
     }
-
-
     override fun onTouchEvent(event: MotionEvent): Boolean {
         gestureDetector.onTouchEvent(event)
         when (event.actionMasked) {
@@ -109,7 +90,6 @@ class ResizableClockTextView @JvmOverloads constructor(
         scaleDetector.onTouchEvent(event)
         return true
     }
-
     private inner class DoubleTapListener : GestureDetector.SimpleOnGestureListener() {
         override fun onDoubleTap(e: MotionEvent): Boolean {
             val nextRotationAngle = rotationAngle + 90f
@@ -127,8 +107,6 @@ class ResizableClockTextView @JvmOverloads constructor(
             return true
         }
     }
-
-
 }
 
 
