@@ -3,7 +3,6 @@ package com.example.decorativeclock
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -16,8 +15,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.TranslateAnimation
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -29,7 +26,6 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textfield.TextInputLayout
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -45,6 +41,10 @@ import java.util.*
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var fontAdapter: ArrayAdapter<String>
+    private lateinit var fontAutocomplete: AutoCompleteTextView
+    private lateinit var currentClockFont: String
+
+
     private lateinit var autoCompleteTextView: AutoCompleteTextView
     private lateinit var previewTextView: TextView
     private lateinit var sharedPreferences: SharedPreferences
@@ -87,6 +87,12 @@ class SettingsActivity : AppCompatActivity() {
         }
 
 
+        fontAutocomplete = findViewById(R.id.font_autocomplete)
+        fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList())
+        fontAutocomplete.setAdapter(fontAdapter)
+
+        // Retrieve the current clock font from shared preferences
+        currentClockFont = sharedPreferences.getString("clock_font", "sans-serif") ?: "sans-serif"
 
 
 
@@ -191,7 +197,7 @@ class SettingsActivity : AppCompatActivity() {
 
         // Initialize fontDropdownMenu and fontAutocomplete
         val fontAutocomplete = findViewById<AutoCompleteTextView>(R.id.font_autocomplete)
-        fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList())
+        //fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList())
         fontAutocomplete.setAdapter(fontAdapter)
 
         // Retrieve the current clock font from shared preferences
@@ -490,12 +496,25 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        val fontAutocomplete = findViewById<AutoCompleteTextView>(R.id.font_autocomplete)
-        val currentPosition = fontAdapter.getPosition(fontAutocomplete.text.toString())
-        outState.putInt("selected_font_position", currentPosition)
+    override fun onResume() {
+        super.onResume()
+
+        // Reinitialize the fontMap with the new context
+        val newFontMap = fontMap
+
+        // Update the fontAdapter with the new fontMap keys
+        fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, newFontMap.keys.toList())
+        fontAutocomplete.setAdapter(fontAdapter)
+
+        // Set the selected item in the AutoCompleteTextView to the current font
+        val currentFontPosition = newFontMap.entries.indexOfFirst { it.value == currentClockFont }
+        if (currentFontPosition != -1) {
+            fontAutocomplete.setText(fontAdapter.getItem(currentFontPosition), false)
+        }
     }
+
+
+
 
 
 
