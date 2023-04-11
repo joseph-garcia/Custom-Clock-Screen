@@ -35,6 +35,7 @@ import com.bumptech.glide.request.RequestOptions
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import androidx.lifecycle.Observer
+import com.google.android.material.button.MaterialButton
 
 
 class MainActivity : AppCompatActivity() {
@@ -112,40 +113,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // listen for gesture detector
-//        clockTextView.setOnTouchListener { _, event ->
-//            doubleTapGestureDetector.onTouchEvent(event)
-//            true
-//        }
+        val helpIcon = findViewById<ImageView>(R.id.helpIcon)
+        helpIcon.setOnClickListener {
+            showHelpOverlay()
+        }
+
 
         // Load and set the saved clock data (position and scale factor)
         val clockData = loadClockPosition()
-
-        // Set the clock text size
-//        clockTextView.viewTreeObserver.addOnGlobalLayoutListener(object :
-//            ViewTreeObserver.OnGlobalLayoutListener {
-//            override fun onGlobalLayout() {
-//                clockTextView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-//
-//                val minX = 0f
-//                val minY = 0f
-//                val maxX = resources.displayMetrics.widthPixels - clockTextView.width.toFloat()
-//                val maxY = resources.displayMetrics.heightPixels - clockTextView.height.toFloat()
-//
-//                if (clockData.first != -1f && clockData.second != -1f) {
-//                    clockTextView.x = clockData.first.coerceIn(minX, maxX)
-//                    clockTextView.y = clockData.second.coerceIn(minY, maxY)
-//                    clockTextView.rotation = clockData.fourth
-//                } else {
-//                    resetClockPosition()
-//                }
-//            }
-//        })
-
-//        clockTextView.setOnClickListener {
-//            val intent = Intent(this, SettingsActivity::class.java)
-//            startActivity(intent)
-//        }
 
         // Run resetClockPosition() on long press anywhere outside of the clock
         val mainLayout = findViewById<RelativeLayout>(R.id.root_layout)
@@ -157,7 +132,16 @@ class MainActivity : AppCompatActivity() {
         loadClockSettings()
     }
 
+    private fun showHelpOverlay() {
+        val helpOverlay = LayoutInflater.from(this).inflate(R.layout.help_overlay, null)
+        val closeButton = helpOverlay.findViewById<MaterialButton>(R.id.close_help_button)
+        closeButton.setOnClickListener {
+            (helpOverlay.parent as? ViewGroup)?.removeView(helpOverlay)
+        }
 
+        val rootView = findViewById<ViewGroup>(android.R.id.content)
+        rootView.addView(helpOverlay)
+    }
 
 
 

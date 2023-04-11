@@ -44,7 +44,7 @@ import java.util.*
 
 
 class SettingsActivity : AppCompatActivity() {
-
+    private lateinit var fontAdapter: ArrayAdapter<String>
     private lateinit var autoCompleteTextView: AutoCompleteTextView
     private lateinit var previewTextView: TextView
     private lateinit var sharedPreferences: SharedPreferences
@@ -85,6 +85,9 @@ class SettingsActivity : AppCompatActivity() {
         cancelIcon.setOnClickListener {
             finish()
         }
+
+
+
 
 
         // initialize colorpicker views
@@ -188,7 +191,7 @@ class SettingsActivity : AppCompatActivity() {
 
         // Initialize fontDropdownMenu and fontAutocomplete
         val fontAutocomplete = findViewById<AutoCompleteTextView>(R.id.font_autocomplete)
-        val fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList())
+        fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList())
         fontAutocomplete.setAdapter(fontAdapter)
 
         // Retrieve the current clock font from shared preferences
@@ -309,8 +312,16 @@ class SettingsActivity : AppCompatActivity() {
         colorPickerView.setInitialColor(currentColor)
         //toggleColorPickerVisibility()
 
-    }
+        // Restore the font dropdown menu state if there's a saved instance state
+        if (savedInstanceState != null) {
+            val selectedFontPosition = savedInstanceState.getInt("selected_font_position")
+            if (selectedFontPosition != -1) {
+                fontAutocomplete.setText(fontAdapter.getItem(selectedFontPosition), false)
+            }
+        }
 
+
+    }
 
     private fun toggleColorPickerVisibility() {
         val colorPickerContainer = findViewById<LinearLayout>(R.id.color_picker_container)
@@ -324,7 +335,6 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-
     private fun updatePreviewFont(selectedFont: String?) {
         val defaultFonts = listOf("sans-serif", "serif", "monospace", "cursive", "fantasy")
         if (selectedFont != null) {
@@ -337,7 +347,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun setBackgroundImage(resultUri: Uri) {
         val backgroundImageView = findViewById<ImageView>(R.id.background_preview)
@@ -381,16 +390,13 @@ class SettingsActivity : AppCompatActivity() {
                     uCrop.start(this)
                 }
             }
-
         } else if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data!!)
             if (resultUri != null) {
                 saveCroppedImageUri(resultUri)
                 setBackgroundImage(resultUri)
             }
-
         }
-
     }
     private fun saveCroppedImageUri(uri: Uri) {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
@@ -420,7 +426,7 @@ class SettingsActivity : AppCompatActivity() {
         textView.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT)
     }
 
-    fun updatePreviewText() {
+    private fun updatePreviewText() {
         val isMilitaryTime = toggleMilitaryTimeSwitch.isChecked
         //val isColonEnabled = toggleColonSwitch.isChecked
 
@@ -434,20 +440,11 @@ class SettingsActivity : AppCompatActivity() {
         val sdf = SimpleDateFormat(formatString, Locale.getDefault())
         val currentTime = Calendar.getInstance().time
 
-        // Log sdf.format(currentTime) to Logcat
-        Log.d("josephDebug", sdf.format(currentTime))
-
         previewTextView.text = sdf.format(currentTime)
 
-        // set previewTextView color from saved preferences
-        val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
-        val currentClockTextColor = sharedPreferences.getInt("clock_text_color", Color.WHITE)
-        previewTextView.setTextColor(currentClockTextColor)
-        Log.d("josephDebug", "currentClockTextColor: $currentClockTextColor")
     }
 
     private fun animateColorPickerContainerVisibility(targetVisibility: Int) {
-        Log.d("josephDebug", "animateColorPickerContainerVisibility: $targetVisibility")
         val colorPickerContainer = findViewById<LinearLayout>(R.id.color_picker_container)
         if (colorPickerContainer.visibility != targetVisibility) {
             val spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -474,7 +471,6 @@ class SettingsActivity : AppCompatActivity() {
                             colorPickerView.setInitialColor(previewTextView.currentTextColor)
                         }
                     }
-
                     override fun onAnimationEnd(animation: Animator) {
                         if (targetVisibility == View.GONE) {
                             colorPickerContainer.visibility = View.GONE
@@ -486,8 +482,6 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-
-
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
@@ -496,6 +490,12 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val fontAutocomplete = findViewById<AutoCompleteTextView>(R.id.font_autocomplete)
+        val currentPosition = fontAdapter.getPosition(fontAutocomplete.text.toString())
+        outState.putInt("selected_font_position", currentPosition)
+    }
 
 
 
