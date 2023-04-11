@@ -234,20 +234,6 @@ class MainActivity : AppCompatActivity() {
         controller.show(WindowInsetsCompat.Type.navigationBars())
     }
 
-    // this method is called when the app is paused and it saves the clock position and scale factor
-//    override fun onWindowFocusChanged(hasFocus: Boolean) {
-//        super.onWindowFocusChanged(hasFocus)
-//
-//        if (hasFocus) {
-//            val minX = 0f
-//            val minY = 0f
-//            val maxX = resources.displayMetrics.widthPixels - clockTextView.width.toFloat()
-//            val maxY = resources.displayMetrics.heightPixels - clockTextView.height.toFloat()
-//
-//            clockTextView.x = clockTextView.x.coerceIn(minX, maxX)
-//            clockTextView.y = clockTextView.y.coerceIn(minY, maxY)
-//        }
-//    }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putFloat("x", clockTextView.x)
