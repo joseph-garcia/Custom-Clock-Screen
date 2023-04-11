@@ -18,10 +18,18 @@
             app:title="Settings"
             app:titleTextColor="@color/whiteOrBlackInverted"
             app:titleCentered="true"
-            app:navigationIcon="@drawable/setting_icon"
             app:layout_scrollFlags="scroll|enterAlways|snap"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"
-            />
+            style="@style/Widget.MaterialComponents.Toolbar.Primary">
+
+            <ImageView
+                android:id="@+id/cancel_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end"
+                android:layout_marginRight="20dp"
+                android:src="@drawable/cancelicon"
+                app:tint="@color/whiteOrBlackInverted" />
+        </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -78,7 +86,7 @@
                 app:cornerRadius="8dp"
                 app:strokeWidth="1dp"
                 app:strokeColor="@color/whiteOrBlack"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="4dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/toggle_color_picker_button"
@@ -89,7 +97,7 @@
                 app:cornerRadius="8dp"
                 app:strokeWidth="1dp"
                 app:strokeColor="@color/whiteOrBlack"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="4dp"/>
 
         <LinearLayout
             android:id="@+id/color_picker_container"
@@ -147,27 +155,28 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Switch
+            <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/toggleMilitaryTimeSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Toggle Military Time" />
+                android:text="24H Clock" />
 
-            <Switch
+            <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/toggleDropShadowSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Drop Shadow"
                 android:checked="true" />
 
-            <Switch
+            <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/toggleColonSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Show Colon"
                 android:checked="true"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"/>
 
 
             <com.google.android.material.button.MaterialButton
