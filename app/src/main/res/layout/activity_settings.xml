@@ -69,34 +69,58 @@
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:id="@+id/background_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:text="Background"
-                android:textSize="18sp"
-                android:textColor="@color/whiteOrBlack"/>
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/changeBackgroundButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Select Image"
+                android:text="Background Image"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 app:cornerRadius="8dp"
                 app:strokeWidth="1dp"
                 app:strokeColor="@color/whiteOrBlack"
                 android:layout_marginBottom="16dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/toggle_color_picker_button"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginBottom="1dp"
-                android:text="Font"
-                android:textSize="18sp"
-                android:textColor="@color/whiteOrBlack"/>
+                android:text="Text Color"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                app:cornerRadius="8dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/whiteOrBlack"
+                android:layout_marginBottom="16dp"/>
+
+        <LinearLayout
+            android:id="@+id/color_picker_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.skydoves.colorpickerview.ColorPickerView
+                android:id="@+id/color_picker_view"
+                android:layout_width="260dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="260dp"
+                android:layout_marginBottom="30dp"/>
+            <com.skydoves.colorpickerview.sliders.AlphaSlideBar
+                android:id="@+id/alphaSlideBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:selector_AlphaSlideBar="@drawable/wheel"
+                app:borderColor_AlphaSlideBar="@android:color/darker_gray"
+                app:borderSize_AlphaSlideBar="5"
+                android:layout_marginBottom="3dp"/>
+            <com.skydoves.colorpickerview.sliders.BrightnessSlideBar
+                android:id="@+id/brightnessSlideBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                app:selector_BrightnessSlider="@drawable/wheel"
+                app:borderColor_BrightnessSlider="@android:color/darker_gray"
+                app:borderSize_BrightnessSlider="5"/>
+
+        </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/font_dropdown_menu"
@@ -111,9 +135,7 @@
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxStrokeColor="@color/whiteOrBlack"
                 app:boxStrokeWidthFocused="1dp"
-
-
-                >
+                android:hint="Change Font">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/font_autocomplete"
@@ -124,8 +146,6 @@
                     android:inputType="none"/>
 
             </com.google.android.material.textfield.TextInputLayout>
-
-
 
             <Switch
                 android:id="@+id/toggleMilitaryTimeSwitch"
@@ -148,28 +168,6 @@
                 android:text="Show Colon"
                 android:checked="true"
                 android:layout_marginBottom="8dp"/>
-
-            <com.skydoves.colorpickerview.ColorPickerView
-                android:id="@+id/color_picker_view"
-                android:layout_width="260dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_height="260dp"
-                android:layout_marginBottom="30dp"/>
-            <com.skydoves.colorpickerview.sliders.AlphaSlideBar
-                android:id="@+id/alphaSlideBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:selector_AlphaSlideBar="@drawable/wheel"
-                app:borderColor_AlphaSlideBar="@android:color/darker_gray"
-                app:borderSize_AlphaSlideBar="5"
-                android:layout_marginBottom="3dp"/>
-            <com.skydoves.colorpickerview.sliders.BrightnessSlideBar
-                android:id="@+id/brightnessSlideBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:selector_BrightnessSlider="@drawable/wheel"
-                app:borderColor_BrightnessSlider="@android:color/darker_gray"
-                app:borderSize_BrightnessSlider="5"/>
 
 
             <com.google.android.material.button.MaterialButton
