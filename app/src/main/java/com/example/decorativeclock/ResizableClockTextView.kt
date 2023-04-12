@@ -10,6 +10,8 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.TextClock
 import android.animation.ObjectAnimator
+import android.graphics.Matrix
+import kotlin.math.sqrt
 
 class ResizableClockTextView @JvmOverloads constructor(
     context: Context,
@@ -17,16 +19,16 @@ class ResizableClockTextView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : TextClock(context, attrs, defStyleAttr) {
 
-    private val scaleDetector: ScaleGestureDetector
+    private var rotationAngle = 0f
     private val gestureDetector: GestureDetector
-    private val originalTextSize = 50f;
-    private var isScalingInProgress = false
-    private var resetLastTouchPosition = false
+    private var resetLastTouchPosition = true
     private var lastTouchX = 0f
     private var lastTouchY = 0f
-    private var rotationAngle = 0f
+    private var originalDistance = 0f
+    private var prevScaleFactor = 1f
+    private var isSecondFingerTouched = false
+
     init {
-        scaleDetector = ScaleGestureDetector(context, ScaleListener())
         gestureDetector = GestureDetector(context, DoubleTapListener())
     }
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -34,36 +36,35 @@ class ResizableClockTextView @JvmOverloads constructor(
         val heightSpec = MeasureSpec.makeMeasureSpec(Int.MAX_VALUE shr 2, MeasureSpec.AT_MOST)
         super.onMeasure(widthSpec, heightSpec)
     }
-    private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-        private var scaleFactor = 1f
-        override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-            isScalingInProgress = true
-            return super.onScaleBegin(detector)
-        }
-        override fun onScale(detector: ScaleGestureDetector): Boolean {
-            val tempScaleFactor = scaleFactor * detector.scaleFactor
-            scaleFactor = tempScaleFactor.coerceAtLeast(0.1f).coerceAtMost(5.0f)
-            // Apply a low-pass filter to the scaleFactor
-            val smoothFactor = 0.2f
-            val smoothScaleFactor = (scaleFactor * smoothFactor) + (this@ResizableClockTextView.scaleX * (1 - smoothFactor))
-            scaleX = smoothScaleFactor
-            scaleY = smoothScaleFactor
-            return true
-        }
-        override fun onScaleEnd(detector: ScaleGestureDetector) {
-            isScalingInProgress = false
-            resetLastTouchPosition = true
-        }
-    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         gestureDetector.onTouchEvent(event)
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                lastTouchX = event.rawX
-                lastTouchY = event.rawY
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                if (event.pointerCount == 2) {
+                    isSecondFingerTouched = true
+                    originalDistance = calculateDistance(event) / prevScaleFactor
+                }
             }
             MotionEvent.ACTION_MOVE -> {
-                if (!scaleDetector.isInProgress && !isScalingInProgress && event.pointerCount < 2) {
+                if (isSecondFingerTouched && event.pointerCount == 2) {
+                    // Calculate the distance between the two fingers
+                    val distance = calculateDistance(event)
+
+                    // Calculate the new scale factor
+                    val newScaleFactor = distance / originalDistance
+
+                    // Apply a low-pass filter to the scaleFactor
+                    val smoothFactor = 0.2f
+                    val smoothScaleFactor = (newScaleFactor * smoothFactor) + (prevScaleFactor * (1 - smoothFactor))
+
+                    // Apply the smooth scale factor to the TextClock
+                    this@ResizableClockTextView.scaleX = smoothScaleFactor
+                    this@ResizableClockTextView.scaleY = smoothScaleFactor
+
+                    // Update the previous scale factor
+                    prevScaleFactor = smoothScaleFactor
+                } else if (!isSecondFingerTouched && event.pointerCount == 1) {
                     if (!resetLastTouchPosition) {
                         val dx = event.rawX - lastTouchX
                         val dy = event.rawY - lastTouchY
@@ -82,13 +83,29 @@ class ResizableClockTextView @JvmOverloads constructor(
                     }
                 }
             }
+            MotionEvent.ACTION_POINTER_UP -> {
+                if (event.pointerCount == 2) {
+                    isSecondFingerTouched = false
+                    resetLastTouchPosition = true
+                }
+            }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 lastTouchX = 0f
                 lastTouchY = 0f
+                resetLastTouchPosition = true
+                isSecondFingerTouched = false
+                if (event.pointerCount == 1) {
+                    resetLastTouchPosition = true
+                }
             }
         }
-        scaleDetector.onTouchEvent(event)
         return true
+    }
+
+    private fun calculateDistance(event: MotionEvent): Float {
+        val dx = event.getX(0) - event.getX(1)
+        val dy = event.getY(0) - event.getY(1)
+        return sqrt(dx * dx + dy * dy)
     }
     private inner class DoubleTapListener : GestureDetector.SimpleOnGestureListener() {
         override fun onDoubleTap(e: MotionEvent): Boolean {

@@ -39,7 +39,6 @@
             android:backgroundTint="@color/black"
             android:lineSpacingMultiplier="1"
             android:maxWidth="10000dp" />
-
     </FrameLayout>
 
 
