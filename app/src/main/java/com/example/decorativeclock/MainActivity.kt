@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // Load and set the saved clock data (position and scale factor)
-        val clockData = loadClockPosition()
+        //val clockData = loadClockPosition()
 
         // Run resetClockPosition() on long press anywhere outside of the clock
         val mainLayout = findViewById<RelativeLayout>(R.id.root_layout)
@@ -239,12 +239,15 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         outState.putFloat("x", clockTextView.x)
         outState.putFloat("y", clockTextView.y)
+        outState.putInt("clock_left_margin", sharedPreferences.getInt("clock_left_margin", 0))
+        outState.putInt("clock_top_margin", sharedPreferences.getInt("clock_top_margin", 0))
+        outState.putFloat("clock_scale_x", sharedPreferences.getFloat("clock_scale_x", 1f))
+        outState.putFloat("clock_scale_y", sharedPreferences.getFloat("clock_scale_y", 1f))
+        outState.putFloat("clock_rotation", sharedPreferences.getFloat("clock_rotation", 0f))
     }
+
     fun resetClockPosition() {
         Log.d("josephDebug", "resetClockPosition running")
-        // Reset the clock position
-        clockTextView.x = (resources.displayMetrics.widthPixels - clockTextView.width) / 2f
-        clockTextView.y = (resources.displayMetrics.heightPixels - clockTextView.height) / 2f
 
         // Reset the clock rotation
         clockTextView.rotation = 0f
@@ -252,20 +255,51 @@ class MainActivity : AppCompatActivity() {
         // Reset clock text size
         clockTextView.textSize = 50f
 
-        saveClockPosition(clockTextView.x, clockTextView.y)
-    }
-    private fun saveClockPosition(x: Float, y: Float) {
-        val sharedPreferences = getSharedPreferences("clock_data", MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val orientation = resources.configuration.orientation
-        val orientationKey = if (orientation == Configuration.ORIENTATION_PORTRAIT) "portrait" else "landscape"
+        // Reset clock size
+        clockTextView.scaleX = 1f
+        clockTextView.scaleY = 1f
 
-        editor.putFloat("${orientationKey}_x", x)
-        editor.putFloat("${orientationKey}_y", y)
-        //editor.putFloat("${orientationKey}_scaleFactor", scaleFactor)
-        editor.putFloat("${orientationKey}_rotation", clockTextView.rotation)
-        editor.apply()
+        // Post a Runnable to the view's queue to make sure it runs after the view has been laid out
+        clockTextView.post {
+            val parent = clockTextView.parent as FrameLayout
+            val leftMargin = (parent.width - clockTextView.width) / 2
+            val topMargin = (parent.height - clockTextView.height) / 2
+
+            val layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            )
+            layoutParams.leftMargin = leftMargin
+            layoutParams.topMargin = topMargin
+            clockTextView.layoutParams = layoutParams
+
+            // Update shared preferences with the new values
+            sharedPreferences.edit {
+                putInt("clock_left_margin", layoutParams.leftMargin)
+                putInt("clock_top_margin", layoutParams.topMargin)
+                putFloat("clock_scale_x", clockTextView.scaleX)
+                putFloat("clock_scale_y", clockTextView.scaleY)
+                putFloat("clock_rotation", clockTextView.rotation)
+                apply()
+            }
+        }
     }
+
+
+
+//    private fun saveClockPosition(x: Float, y: Float) {
+//        val sharedPreferences = getSharedPreferences("clock_data", MODE_PRIVATE)
+//        val editor = sharedPreferences.edit()
+//        val orientation = resources.configuration.orientation
+//        val orientationKey = if (orientation == Configuration.ORIENTATION_PORTRAIT) "portrait" else "landscape"
+//
+//        editor.putFloat("${orientationKey}_x", x)
+//        editor.putFloat("${orientationKey}_y", y)
+//        //editor.putFloat("${orientationKey}_scaleFactor", scaleFactor)
+//        editor.putFloat("${orientationKey}_rotation", clockTextView.rotation)
+//        editor.apply()
+//        Log.d("josephDebug", "saveClockPosition running")
+//    }
 
     private fun loadClockPosition(): Quadruple<Float, Float, Float, Float> {
         val sharedPreferences = getSharedPreferences("clock_data", MODE_PRIVATE)
@@ -286,7 +320,7 @@ class MainActivity : AppCompatActivity() {
                 .setDuration(500)
                 .withEndAction {
                     isRotating = false
-                    saveClockPosition(clockTextView.x, clockTextView.y)
+                    //saveClockPosition(clockTextView.x, clockTextView.y)
                 }
                 .start()
         }
@@ -372,7 +406,7 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         val clockTextView: ResizableClockTextView = findViewById(R.id.clockTextView)
-
+        Log.d("josephDebug", "onPause running")
         val layoutParams = clockTextView.layoutParams as FrameLayout.LayoutParams
         sharedPreferences.edit {
             putInt("clock_left_margin", layoutParams.leftMargin)
@@ -443,13 +477,16 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
         val selectedFont = sharedPreferences.getString("clock_font", "sans-serif")
         val textColor = sharedPreferences.getInt("clock_text_color", ContextCompat.getColor(this, R.color.icon_color))
-        Log.d("josephDebug", "default color: ${ContextCompat.getColor(this, R.color.icon_color)}")
+        val defaultFonts = listOf("sans-serif", "serif", "monospace", "cursive", "fantasy")
 
-        if (selectedFont == "pressstart_regular") {
-            val customTypeface = ResourcesCompat.getFont(this, R.font.pressstart_regular)
-            clockTextView.typeface = customTypeface
-        } else {
+        if (defaultFonts.contains(selectedFont)) {
             clockTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
+        } else {
+            val fontResourceId = getFontResourceId(selectedFont)
+            if (fontResourceId != null) {
+                val customTypeface = ResourcesCompat.getFont(this, fontResourceId)
+                clockTextView.typeface = customTypeface
+            }
         }
 
         clockTextView.setTextColor(textColor)

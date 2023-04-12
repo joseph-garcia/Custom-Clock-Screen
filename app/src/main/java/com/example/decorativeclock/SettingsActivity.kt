@@ -1,4 +1,5 @@
 package com.example.decorativeclock
+import FontArrayAdapter
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
@@ -38,7 +39,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var fontAdapter: ArrayAdapter<String>
+    private lateinit var fontAdapter: FontArrayAdapter
     private lateinit var fontAutocomplete: AutoCompleteTextView
 
     private lateinit var currentClockFont: String
@@ -52,15 +53,35 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var toggleDropShadowSwitch: SwitchMaterial
     private val fontMap = mapOf(
         "Default" to "sans-serif",
-        "Serif" to "serif",
-        "Monospace" to "monospace",
+        "Abril Fatface" to "abrilfatface",
+        "Audiowide" to "audiowide",
+        "Bebas Neue" to "bebasneue",
+        "Big Shoulders Display" to "bigshouldersdisplay",
         "Cursive" to "cursive",
         "Fantasy" to "fantasy",
-        "Press Start" to "pressstart_regular"
+        "Gajraj One" to "gajraj_one",
+        "Gruppo" to "gruppo",
+        "Lilita One" to "lilita_one",
+        "Monospace" to "monospace",
+        "Poiret One" to "poiret_one",
+        "Press Start" to "pressstart_regular",
+        "Roboto" to "roboto",
+        "Serif" to "serif",
+        "Tilt Prism" to "tiltprism"
     )
 
     private val customFontResourceMap = mapOf(
-        "pressstart_regular" to R.font.pressstart_regular
+        "pressstart_regular" to R.font.pressstart_regular,
+        "abrilfatface" to R.font.abrilfatface,
+        "audiowide" to R.font.audiowide,
+        "bebasneue" to R.font.bebas_neue,
+        "bigshouldersdisplay" to R.font.bigshouldersdisplay,
+        "gajraj_one" to R.font.gajraj_one,
+        "gruppo" to R.font.gruppo,
+        "lilita_one" to R.font.lilita_one,
+        "poiret_one" to R.font.poiret_one,
+        "roboto" to R.font.roboto,
+        "tiltprism" to R.font.tiltprism
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +97,7 @@ class SettingsActivity : AppCompatActivity() {
         previewTextView.setTextColor(savedColor)
 
         fontAutocomplete = findViewById(R.id.font_autocomplete)
-        fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList())
+        fontAdapter = FontArrayAdapter(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList(), fontMap, customFontResourceMap)
         fontAutocomplete.setAdapter(fontAdapter)
 
         // On Click Listeners
@@ -137,7 +158,7 @@ class SettingsActivity : AppCompatActivity() {
                 if (defaultFonts.contains(selectedFont)) {
                     previewTextView.typeface = Typeface.create(selectedFont, Typeface.NORMAL)
                 } else {
-                    val fontResourceId = customFontResourceMap[selectedFont]
+                    val fontResourceId = getFontResourceId(selectedFont)
                     if (fontResourceId != null) {
                         val customTypeface = ResourcesCompat.getFont(this@SettingsActivity, fontResourceId)
                         previewTextView.typeface = customTypeface
@@ -430,7 +451,7 @@ class SettingsActivity : AppCompatActivity() {
         val newFontMap = fontMap
 
         // Update the fontAdapter with the new fontMap keys
-        fontAdapter = ArrayAdapter<String>(this, R.layout.dropdown_menu_popup_item, newFontMap.keys.toList())
+        fontAdapter = FontArrayAdapter(this, R.layout.dropdown_menu_popup_item, fontMap.keys.toList(), fontMap, customFontResourceMap)
         fontAutocomplete.setAdapter(fontAdapter)
 
         // Set the selected item in the AutoCompleteTextView to the current font

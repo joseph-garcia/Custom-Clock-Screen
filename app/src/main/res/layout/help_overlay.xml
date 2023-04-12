@@ -19,6 +19,7 @@
             android:text="Reposition: Touch &amp; Drag"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
+            android:layout_gravity="center"
             />
 
         <TextView
@@ -26,21 +27,24 @@
             android:layout_height="wrap_content"
             android:text="Resize: Pinch"
             android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:layout_gravity="center"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Rotate: Double Tap"
             android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:layout_gravity="center"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Reset Position: Long Press"
+            android:text="Reset Clock: Long Press outside clock text"
             android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:layout_gravity="center"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/close_help_button"
