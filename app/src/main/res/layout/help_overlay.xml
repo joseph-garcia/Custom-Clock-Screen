@@ -2,59 +2,120 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#99000000"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    >
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:orientation="vertical"
-        android:paddingBottom="90dp">
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true"
+        android:layout_gravity="center"
+        app:cardBackgroundColor="#CC000000"
+        >
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Reposition: Touch &amp; Drag"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:layout_gravity="center"
-            />
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:orientation="vertical"
+            android:paddingBottom="50dp"
+            android:paddingTop="50dp"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Resize: Pinch"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:layout_gravity="center"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reposition"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:paddingBottom="2dp"
+                />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rotate: Double Tap"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:layout_gravity="center"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Press &amp; drag with one finger"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:layout_gravity="start"
+                android:paddingBottom="10dp"
+                />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Reset Clock: Long Press outside clock text"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:layout_gravity="center"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Resize"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:paddingBottom="2dp"
+                />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/close_help_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Close"
-            android:textColor="@color/whiteOrBlackInverted"
-            app:backgroundTint="@color/whiteOrBlack"
-            android:layout_gravity="center"
-            app:cornerRadius="8dp" />
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pinch with two fingers"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:layout_gravity="start"
+                android:paddingBottom="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rotate"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:paddingBottom="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Double tap with one finger"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:layout_gravity="start"
+                android:paddingBottom="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reset Position &amp; Size"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:paddingBottom="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Long press with one finger"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:layout_gravity="start"
+                android:paddingBottom="10dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/close_help_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:text="Close"
+                android:textColor="@color/whiteOrBlackInverted"
+                app:backgroundTint="@color/whiteOrBlack"
+                android:layout_gravity="center"
+                app:cornerRadius="8dp" />
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 </FrameLayout>
