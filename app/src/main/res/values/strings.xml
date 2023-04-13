@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">DecorativeClock</string>
+    <string name="app_name">Custom Clock Screen</string>
     <string name="guide_text">Reposition: Click &amp; Drag\nResize: Pinch\nRotate: Double Tap\nReset Position: Long Press</string>
 </resources>

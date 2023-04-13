@@ -12,9 +12,12 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/black</item>
         <!-- Customize your theme here. -->
-
+        <item name="android:fontFamily">@font/inter_font</item>
+        <item name="fontFamily">@font/inter_font</item>
 
     </style>
+
+
 
     <style name="CustomExposedDropdownMenu" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="android:minHeight">16dp</item> <!-- Adjust the height here -->
