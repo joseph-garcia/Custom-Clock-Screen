@@ -43,27 +43,21 @@ class MainActivity : AppCompatActivity() {
 
     // Initialize clockTextView
     private lateinit var clockTextView: ResizableClockTextView
-    private var timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-
     private var isRotating = false
 
     // Initialize optionsIcon and fadeHandler for fading in/out the options icon
     private lateinit var optionsIcon: ImageView
     private lateinit var helpIcon: ImageView
     private val fadeHandler = Handler(Looper.getMainLooper())
-    private var statusBarHeight = 0
     private val fadeOutHandler = Handler(Looper.getMainLooper())
-
-    private lateinit var gestureDetector: GestureDetector
-
-    // Initialize notificationBarHandler for fading in/out the notification bar
+    private var statusBarHeight = 0
     private val notificationBarHandler = Handler(Looper.getMainLooper())
 
+    private lateinit var gestureDetector: GestureDetector
     companion object {
         private const val REQUEST_IMAGE_PICK = 1000
         const val BACKGROUND_IMAGE_URI_KEY = "background_image_uri"
     }
-
     private lateinit var sharedPreferences: SharedPreferences
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -75,17 +69,8 @@ class MainActivity : AppCompatActivity() {
         // Keep the screen on while this activity is running
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        // initialize gesture detector to override later
-        val doubleTapGestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onDoubleTap(e: MotionEvent): Boolean {
-                Log.d("josephDebug", "DOUBLE TAPPING")
-                rotateClockTextView()
-                return true
-            }
-        })
 
         sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
-        val isMilitaryTime = sharedPreferences.getBoolean("military_time", false)
 
         // Initialize optionsIcon and helpIcon
         optionsIcon = findViewById(R.id.optionsIcon)
@@ -119,10 +104,6 @@ class MainActivity : AppCompatActivity() {
             showHelpOverlay()
         }
 
-
-        // Load and set the saved clock data (position and scale factor)
-        //val clockData = loadClockPosition()
-
         // Run resetClockPosition() on long press anywhere outside of the clock
         val mainLayout = findViewById<RelativeLayout>(R.id.root_layout)
         mainLayout.setOnLongClickListener {
@@ -143,13 +124,8 @@ class MainActivity : AppCompatActivity() {
         val rootView = findViewById<ViewGroup>(android.R.id.content)
         rootView.addView(helpOverlay)
     }
-
-
-
     @SuppressLint("ClickableViewAccessibility")
     private fun setupFadeInFadeOutBehavior() {
-        Log.d("josephDebug", "setting fade behavior")
-        // Set up the fade in/out behavior
         val fadeOutRunnable = Runnable { fadeOutViews() }
 
         // Add this line to start the fade out timer when the app starts
@@ -186,17 +162,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
-    // Add these helper methods to fade in and fade out the views
     private fun fadeOutViews() {
         optionsIcon.animate().alpha(0f).duration = 300
         helpIcon.animate().alpha(0f).duration = 300
-
-        // Use the new notification bar handler to schedule a new action
         notificationBarHandler.postDelayed({
             hideSystemUI()
-        }, 3000) // 3 seconds idle threshold
+        }, 3000) // X seconds idle threshold
     }
 
     private fun fadeInViews() {
@@ -207,7 +178,6 @@ class MainActivity : AppCompatActivity() {
             .withEndAction {
                 // Reset the options icon's position
                 optionsIcon.y = statusBarHeight.toFloat()
-
             }
             .start()
 
@@ -246,16 +216,10 @@ class MainActivity : AppCompatActivity() {
         outState.putFloat("clock_rotation", sharedPreferences.getFloat("clock_rotation", 0f))
     }
 
-    fun resetClockPosition() {
-        Log.d("josephDebug", "resetClockPosition running")
-
-        // Reset the clock rotation
+    private fun resetClockPosition() {
+        // Reset the clock rotation, size, and position
         clockTextView.rotation = 0f
-
-        // Reset clock text size
         clockTextView.textSize = 50f
-
-        // Reset clock size
         clockTextView.scaleX = 1f
         clockTextView.scaleY = 1f
 
@@ -284,34 +248,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
-
-//    private fun saveClockPosition(x: Float, y: Float) {
-//        val sharedPreferences = getSharedPreferences("clock_data", MODE_PRIVATE)
-//        val editor = sharedPreferences.edit()
-//        val orientation = resources.configuration.orientation
-//        val orientationKey = if (orientation == Configuration.ORIENTATION_PORTRAIT) "portrait" else "landscape"
-//
-//        editor.putFloat("${orientationKey}_x", x)
-//        editor.putFloat("${orientationKey}_y", y)
-//        //editor.putFloat("${orientationKey}_scaleFactor", scaleFactor)
-//        editor.putFloat("${orientationKey}_rotation", clockTextView.rotation)
-//        editor.apply()
-//        Log.d("josephDebug", "saveClockPosition running")
-//    }
-
-    private fun loadClockPosition(): Quadruple<Float, Float, Float, Float> {
-        val sharedPreferences = getSharedPreferences("clock_data", MODE_PRIVATE)
-        val orientation = resources.configuration.orientation
-        val orientationKey = if (orientation == Configuration.ORIENTATION_PORTRAIT) "portrait" else "landscape"
-
-        val x = sharedPreferences.getFloat("${orientationKey}_x", -1f)
-        val y = sharedPreferences.getFloat("${orientationKey}_y", -1f)
-        val scaleFactor = sharedPreferences.getFloat("${orientationKey}_scaleFactor", 1f)
-        val rotation = sharedPreferences.getFloat("${orientationKey}_rotation", 0f) // Add this line
-        return Quadruple(x, y, scaleFactor, rotation)
-    }
     private fun rotateClockTextView() {
         if (!isRotating) {
             isRotating = true
@@ -320,23 +256,11 @@ class MainActivity : AppCompatActivity() {
                 .setDuration(500)
                 .withEndAction {
                     isRotating = false
-                    //saveClockPosition(clockTextView.x, clockTextView.y)
                 }
                 .start()
         }
     }
     @RequiresApi(Build.VERSION_CODES.O)
-//    fun updateClock(isMilitaryTime: Boolean) {
-//        if (!::clockTextView.isInitialized) return
-//
-//        val currentTime = LocalDateTime.now()
-//        val formattedTime = if (isMilitaryTime) {
-//            currentTime.format(DateTimeFormatter.ofPattern("HH:mm"))
-//        } else {
-//            currentTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
-//        }
-//        clockTextView.text = formattedTime
-//    }
     // Add this method to get the status bar height for the options icon
     private fun getStatusBarHeight(): Int {
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
@@ -346,23 +270,19 @@ class MainActivity : AppCompatActivity() {
             0
         }
     }
-    // Add this method to save the background image URI
     override fun onResume() {
         super.onResume()
-        Log.d("josephDebug", "onResume running")
         val backgroundImageUriString = sharedPreferences.getString(BACKGROUND_IMAGE_URI_KEY, null)
         if (backgroundImageUriString != null) {
             val backgroundImageUri = Uri.fromFile(File(backgroundImageUriString))
             setBackgroundImage(backgroundImageUri)
         }
-
         val clockFont = sharedPreferences.getString("clock_font", "sans-serif")
         val clockTextView: ResizableClockTextView = findViewById(R.id.clockTextView)
         clockTextView.typeface = Typeface.create(clockFont, Typeface.NORMAL)
 
         updateDropShadow()
         loadClockSettings()
-
 
         clockTextView.viewTreeObserver.addOnGlobalLayoutListener(object :
             ViewTreeObserver.OnGlobalLayoutListener {
@@ -402,11 +322,9 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-
     override fun onPause() {
         super.onPause()
         val clockTextView: ResizableClockTextView = findViewById(R.id.clockTextView)
-        Log.d("josephDebug", "onPause running")
         val layoutParams = clockTextView.layoutParams as FrameLayout.LayoutParams
         sharedPreferences.edit {
             putInt("clock_left_margin", layoutParams.leftMargin)
@@ -470,9 +388,7 @@ class MainActivity : AppCompatActivity() {
                 setBackgroundImage(resultUri)
             }
         }
-
     }
-
     private fun loadClockSettings() {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", Context.MODE_PRIVATE)
         val selectedFont = sharedPreferences.getString("clock_font", "sans-serif")
@@ -488,9 +404,7 @@ class MainActivity : AppCompatActivity() {
                 clockTextView.typeface = customTypeface
             }
         }
-
         clockTextView.setTextColor(textColor)
-
         // get isColonEnabled from SharedPreferences
         val isColonEnabled = sharedPreferences.getBoolean("is_colon_enabled", true)
         val colonFormatString = if (isColonEnabled) {
@@ -499,9 +413,7 @@ class MainActivity : AppCompatActivity() {
             " "
         }
 
-        // get is_24_hour_format from SharedPreferences
         val is24HourFormat = sharedPreferences.getBoolean("is_24_hour_format", false)
-        // set the ClockText based on the value of is_24_hour_format with clockTextView.setFormat12Hour() or clockTextView.setFormat24Hour()
         if (is24HourFormat) {
             clockTextView.format12Hour = null
             clockTextView.format24Hour = "HH" + colonFormatString + "mm"
@@ -509,12 +421,7 @@ class MainActivity : AppCompatActivity() {
             clockTextView.format24Hour = null
             clockTextView.format12Hour = "hh" + colonFormatString + "mm a"
         }
-
-
-
     }
-
-
     private fun updateDropShadow() {
         val sharedPreferences = getSharedPreferences("decorative_clock_preferences", MODE_PRIVATE)
         val isDropShadowEnabled = sharedPreferences.getBoolean("is_drop_shadow_enabled", true)
@@ -525,11 +432,4 @@ class MainActivity : AppCompatActivity() {
             clockTextView.setShadowLayer(0f, 0f, 0f, Color.BLACK)
         }
     }
-
-
-
 }
-
-
-
-data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
