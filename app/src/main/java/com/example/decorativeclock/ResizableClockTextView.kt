@@ -1,16 +1,12 @@
 package com.example.decorativeclock
-import android.content.Context
-import android.graphics.Canvas
-import android.util.AttributeSet
-import android.util.Log
-import android.view.MotionEvent
-import android.view.GestureDetector
-import android.view.ScaleGestureDetector
-import android.widget.FrameLayout
-import android.widget.RelativeLayout
-import android.widget.TextClock
 import android.animation.ObjectAnimator
-import android.graphics.Matrix
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.AttributeSet
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.widget.FrameLayout
+import android.widget.TextClock
 import kotlin.math.sqrt
 
 class ResizableClockTextView @JvmOverloads constructor(
@@ -37,6 +33,7 @@ class ResizableClockTextView @JvmOverloads constructor(
         super.onMeasure(widthSpec, heightSpec)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         gestureDetector.onTouchEvent(event)
         when (event.actionMasked) {
@@ -48,11 +45,8 @@ class ResizableClockTextView @JvmOverloads constructor(
             }
             MotionEvent.ACTION_MOVE -> {
                 if (isSecondFingerTouched && event.pointerCount == 2) {
-                    // Calculate the distance between the two fingers
-                    val distance = calculateDistance(event)
-
                     // Calculate the new scale factor
-                    val newScaleFactor = distance / originalDistance
+                    val newScaleFactor = calculateDistance(event) / originalDistance
 
                     // Apply a low-pass filter to the scaleFactor
                     val smoothFactor = 0.2f
@@ -64,7 +58,7 @@ class ResizableClockTextView @JvmOverloads constructor(
 
                     // Update the previous scale factor
                     prevScaleFactor = smoothScaleFactor
-                } else if (!isSecondFingerTouched && event.pointerCount == 1) {
+                } else if (!isSecondFingerTouched) {
                     if (!resetLastTouchPosition) {
                         val dx = event.rawX - lastTouchX
                         val dy = event.rawY - lastTouchY
@@ -73,35 +67,19 @@ class ResizableClockTextView @JvmOverloads constructor(
                         layoutParams.leftMargin += dx.toInt()
                         layoutParams.topMargin += dy.toInt()
                         this.layoutParams = layoutParams
-
-                        lastTouchX = event.rawX
-                        lastTouchY = event.rawY
-                    } else {
-                        lastTouchX = event.rawX
-                        lastTouchY = event.rawY
-                        resetLastTouchPosition = false
                     }
+                    lastTouchX = event.rawX
+                    lastTouchY = event.rawY
+                    resetLastTouchPosition = false
                 }
             }
-            MotionEvent.ACTION_POINTER_UP -> {
-                if (event.pointerCount == 2) {
-                    isSecondFingerTouched = false
-                    resetLastTouchPosition = true
-                }
-            }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                lastTouchX = 0f
-                lastTouchY = 0f
+            MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 resetLastTouchPosition = true
                 isSecondFingerTouched = false
-                if (event.pointerCount == 1) {
-                    resetLastTouchPosition = true
-                }
             }
         }
         return true
     }
-
     private fun calculateDistance(event: MotionEvent): Float {
         val dx = event.getX(0) - event.getX(1)
         val dy = event.getY(0) - event.getY(1)
@@ -119,7 +97,6 @@ class ResizableClockTextView @JvmOverloads constructor(
             )
             rotateAnimator.duration = 300 // Duration of the animation in milliseconds
             rotateAnimator.start()
-
             rotationAngle = nextRotationAngle % 360
             return true
         }
