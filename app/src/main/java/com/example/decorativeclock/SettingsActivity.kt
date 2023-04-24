@@ -113,12 +113,7 @@ class SettingsActivity : AppCompatActivity() {
         toggleColorPickerButton.setOnClickListener {
             toggleColorPickerVisibility()
         }
-        //toggleColonSwitch = findViewById(R.id.toggleColonSwitch)
-        //        toggleColonSwitch.setOnCheckedChangeListener { _, _ ->
-        //            updatePreviewText()
-        //        }
 
-        //val isColonEnabled = sharedPreferences.getBoolean("is_colon_enabled", true)
         setupDropShadow()
         setupMilitarySwitch()
         setupColorPicker()
@@ -390,9 +385,7 @@ class SettingsActivity : AppCompatActivity() {
     }
     private fun setCustomClockFormat() {
         val isMilitaryTime = toggleMilitaryTimeSwitch.isChecked
-        //val isColonEnabled = toggleColonSwitch.isChecked
         val hourFormat = if (isMilitaryTime) "HH" else "h"
-        //val separator = if (isColonEnabled) ":" else " "
         val minuteFormat = "mm"
         val amPmFormat = if (isMilitaryTime) "" else " a"
         val formatString = "$hourFormat:$minuteFormat$amPmFormat"
