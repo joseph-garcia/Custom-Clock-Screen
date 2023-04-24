@@ -1,42 +1,34 @@
 package com.example.decorativeclock
 
 
-import androidx.appcompat.app.AppCompatActivity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.Point
+import android.graphics.Typeface
 import android.net.Uri
+import android.os.*
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import java.io.File
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
-import kotlin.math.max
-import kotlin.math.min
-import com.yalantis.ucrop.UCrop
-import android.graphics.Point
-import android.graphics.Typeface
-import android.os.*
-import android.util.Log
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import androidx.lifecycle.Observer
 import com.google.android.material.button.MaterialButton
+import com.yalantis.ucrop.UCrop
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -215,7 +207,6 @@ class MainActivity : AppCompatActivity() {
         outState.putFloat("clock_scale_y", sharedPreferences.getFloat("clock_scale_y", 1f))
         outState.putFloat("clock_rotation", sharedPreferences.getFloat("clock_rotation", 0f))
     }
-
     private fun resetClockPosition() {
         // Reset the clock rotation, size, and position
         clockTextView.rotation = 0f
