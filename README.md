@@ -1,4 +1,4 @@
-# DecorativeClock
+# Custom Clock Screen
  
 Custom Clock Screen is an android app designed to make your device into a decorative clock display with a focus on personalization and ease of use.
 
